@@ -152,7 +152,7 @@ textarea {
 
 /* Settings UI Styles */
 .settings-section {
-  margin-top: 32px;
+  margin-top: 16px;
   text-align: left;
   width: 100%;
 }
@@ -164,18 +164,20 @@ textarea {
 }
 
 .setting-group {
-  margin-bottom: 24px;
-  padding: 20px;
+  margin-bottom: 16px;
+  padding: 16px;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   background: #fafafa;
 }
+
 
 .setting-group label {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
   color: #333;
+  font-size: 0.95em;
 }
 
 .setting-input {
@@ -401,5 +403,32 @@ textarea {
 
   .no-bangs {
     color: #999;
+  }
+}
+
+/* Add styles for the GitHub link */
+.github-link {
+  text-align: center;
+  margin-top: 30px; /* Adjust spacing as needed */
+  font-size: 14px;
+}
+
+.github-link a {
+  color: #666; /* Match footer link color */
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.github-link a:hover {
+  color: #333; /* Match footer link hover color */
+}
+
+/* Dark mode styles for the GitHub link */
+@media (prefers-color-scheme: dark) {
+  .github-link a {
+    color: #999; /* Dark mode link color */
+  }
+  .github-link a:hover {
+    color: #eee; /* Dark mode hover color */
   }
 }

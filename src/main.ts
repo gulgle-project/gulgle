@@ -67,7 +67,7 @@ function renderSettingsUI() {
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px;">
       <div class="content-container">
         <h1>Und*ckling</h1>
-        <p>DuckDuckGo's bang redirects are too slow. Add the following URL as a custom search engine to your browser. Enables <a href="https://duckduckgo.com/bang.html" target="_blank">all of DuckDuckGo's bangs.</a></p>
+        <p><a href="https://unduck.link/">Unduck</a> and <a href="https://duckduckgo.com/">DuckDuckGo's</a> bangs lacks features. Add the following URL as a custom search engine to your browser to use Und*ckling's fast client-side redirects, including <a href="https://duckduckgo.com/bangs">all DuckDuckGo bangs</a>, custom bangs, and configurable default search engine.</p>
         
         <div class="url-container"> 
           <input 
@@ -82,7 +82,6 @@ function renderSettingsUI() {
         </div>
 
         <div class="settings-section">
-          <h2>Settings</h2>
           
           <div class="setting-group">
             <label for="default-bang-select">Default Search Engine:</label>
@@ -98,7 +97,7 @@ function renderSettingsUI() {
           </div>
 
           <div class="setting-group">
-            <h3>Custom Bangs</h3>
+            <label>Custom Bangs:</label>
             <div class="custom-bangs-list">
               ${customBangs.length === 0 ? 
                 '<p class="no-bangs">No custom bangs yet. Add one below!</p>' :
@@ -115,7 +114,7 @@ function renderSettingsUI() {
             </div>
             
             <div class="add-bang-form">
-              <h4>Add Custom Bang</h4>
+              <label>Add Custom Bang</label>
               <div class="form-row">
                 <input type="text" id="bang-trigger" placeholder="Trigger (e.g., 'gh')" class="form-input" />
                 <input type="text" id="bang-name" placeholder="Name (e.g., 'GitHub')" class="form-input" />
@@ -125,6 +124,9 @@ function renderSettingsUI() {
             </div>
           </div>
         </div>
+        <p class="github-link">
+          <a href="https://github.com/dev-bhaskar8/unduckling" target="_blank">View on GitHub</a>
+        </p>
       </div>
     </div>
   `;
