@@ -67,7 +67,7 @@ function renderSettingsUI() {
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px;">
       <div class="content-container">
         <h1>Und*ckling</h1>
-        <p><a href="https://unduck.link/">Unduck</a> and <a href="https://duckduckgo.com/">DuckDuckGo's</a> bangs lacks features. Add the following URL as a custom search engine to your browser to use Und*ckling's fast client-side redirects, including <a href="https://duckduckgo.com/bangs">all DuckDuckGo bangs</a>, custom bangs, and configurable default search engine.</p>
+        <p><a href="https://unduck.link/">Und*ck</a> and <a href="https://duckduckgo.com/">DuckDuckGo's</a> bangs lacks features. Add the following URL as a custom search engine to your browser to use Und*ckling's fast client-side redirects, including <a href="https://duckduckgo.com/bangs">all DuckDuckGo bangs</a>, custom bangs, and configurable default search engine.</p>
         
         <div class="url-container"> 
           <input 
