@@ -1,5 +1,5 @@
 # Unduckling - Custom duckduckgo bangs and more
-
+<img width="1440" alt="Screenshot 2025-05-26 at 7 47 15 AM" src="https://github.com/user-attachments/assets/b4560574-835a-46c7-a43d-e4eeda029b13" />
 DuckDuckGo's bang redirects are too slow. Add the following URL as a custom search engine to your browser. Enables all of DuckDuckGo's bangs to work, but much faster.
 
 ```
@@ -19,6 +19,6 @@ I solved this by doing all of the work client side. Once you've went to https://
 - Custom Bangs: Users can add their own custom bang shortcuts directly within the application's settings, which are stored locally in the browser.
 - Configurable Default Search Engine: Users can choose their preferred default search engine from a list of popular options, including any custom bangs they have added.
 - Automated Bang List Updates: A GitHub Actions workflow is set up to automatically fetch and update the list of default bangs from DuckDuckGo's API on a monthly basis.
-<img width="1440" alt="Screenshot 2025-05-26 at 7 47 15 AM" src="https://github.com/user-attachments/assets/b4560574-835a-46c7-a43d-e4eeda029b13" />
+
 
 
