@@ -2,8 +2,8 @@ name: Update Bang List
 
 on:
   schedule:
-    # Run every minute for testing
-    - cron: '* * * * *'
+    # Run every 5 minutes for testing
+    - cron: '*/5 * * * *'
   workflow_dispatch: # Allow manual triggering
   push:
     branches: [main, master, vaasmain]
