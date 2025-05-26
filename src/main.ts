@@ -120,7 +120,7 @@ function renderSettingsUI() {
                 <input type="text" id="bang-trigger" placeholder="Trigger (e.g., 'gh')" class="form-input" />
                 <input type="text" id="bang-name" placeholder="Name (e.g., 'GitHub')" class="form-input" />
               </div>
-              <input type="text" id="bang-url" placeholder="URL template (use %s for search term)" class="form-input full-width" />
+              <input type="text" id="bang-url" placeholder="URL (direct link or search template with %s)" class="form-input full-width" />
               <button id="add-bang-btn" class="primary-button">Add Bang</button>
             </div>
           </div>
@@ -170,17 +170,27 @@ function setupEventListeners() {
       return;
     }
 
-    if (!url.includes("%s")) {
-      alert("URL must contain %s placeholder for search terms");
+    // Smart URL validation - accept both direct URLs and search templates
+    let finalUrl = url;
+    try {
+      // Test if it's a valid URL
+      new URL(url.includes("%s") ? url.replace("%s", "test") : url);
+      
+      // If URL doesn't contain %s, it's a direct link - no modification needed
+      // If URL contains %s, it's a search template - no modification needed
+      // Both are valid and will be handled smartly in the redirect logic
+      
+    } catch (error) {
+      alert("Please enter a valid URL");
       return;
     }
 
-    const domain = new URL(url.replace("%s", "test")).hostname;
+    const domain = new URL(finalUrl.includes("%s") ? finalUrl.replace("%s", "test") : finalUrl).hostname;
 
     CustomBangsManager.addCustomBang({
       t: trigger,
       s: name,
-      u: url,
+      u: finalUrl,
       d: domain
     });
 
@@ -238,21 +248,31 @@ function getBangRedirectUrl(): string | null {
   // Remove the first bang from the query
   const cleanQuery = query.replace(/!\S+\s*/i, "").trim();
 
-  // If the query is just a bang (e.g., `!gh`), go to the domain
-  if (cleanQuery === "") {
-    return selectedBang ? `https://${selectedBang.d}` : null;
-  }
-
-  // Replace the search placeholder with the actual query
-  // Handle both %s (for custom bangs) and {{{s}}} (for default bangs)
+  // Smart redirect logic: handle both direct URLs and search templates
   let searchUrl = selectedBang.u;
-  if (searchUrl.includes("%s")) {
-    searchUrl = searchUrl.replace("%s", encodeURIComponent(cleanQuery).replace(/%2F/g, "/"));
-  } else if (searchUrl.includes("{{{s}}}")) {
-    searchUrl = searchUrl.replace("{{{s}}}", encodeURIComponent(cleanQuery).replace(/%2F/g, "/"));
+  
+  // Check if the URL contains search placeholders
+  const hasSearchPlaceholder = searchUrl.includes("%s") || searchUrl.includes("{{{s}}}");
+  
+  if (hasSearchPlaceholder) {
+    // This is a search template URL
+    if (cleanQuery === "") {
+      // If no search term provided, go to the domain homepage
+      return `https://${selectedBang.d}`;
+    } else {
+      // Replace the search placeholder with the actual query
+      if (searchUrl.includes("%s")) {
+        searchUrl = searchUrl.replace("%s", encodeURIComponent(cleanQuery).replace(/%2F/g, "/"));
+      } else if (searchUrl.includes("{{{s}}}")) {
+        searchUrl = searchUrl.replace("{{{s}}}", encodeURIComponent(cleanQuery).replace(/%2F/g, "/"));
+      }
+      return searchUrl;
+    }
+  } else {
+    // This is a direct URL (no search placeholder)
+    // Always go to the exact URL regardless of whether there's a search term
+    return searchUrl;
   }
-
-  return searchUrl;
 }
 
 function doRedirect() {
