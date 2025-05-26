@@ -1,4 +1,4 @@
-<img width="1440" alt="Screenshot 2025-05-26 at 5 27 41 AM" src="https://github.com/user-attachments/assets/67a2a666-82ee-4b4b-b125-189a22dba521" /># Unduckling - Custom duckduckgo bangs and more
+# Unduckling - Custom duckduckgo bangs and more
 
 DuckDuckGo's bang redirects are too slow. Add the following URL as a custom search engine to your browser. Enables all of DuckDuckGo's bangs to work, but much faster.
 
