@@ -58,6 +58,23 @@ h6 {
   line-height: 1.2;
 }
 
+h1 {
+  font-size: 1.75rem;
+  margin-bottom: 12px;
+}
+
+/* Mobile-first responsive typography */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+  
+  h1 {
+    font-size: 1.75rem;
+    margin-bottom: 16px;
+  }
+}
+
 a {
   color: #444444;
 }
@@ -71,11 +88,16 @@ button {
   border: none;
   background: none;
   cursor: pointer;
+  /* Improve touch targets on mobile */
+  min-height: 44px;
+  min-width: 44px;
 }
 
 input,
 textarea {
   font: inherit;
+  /* Improve touch targets on mobile */
+  min-height: 44px;
 }
 
 /* Add these new styles */
@@ -83,33 +105,78 @@ textarea {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 16px;
+  margin-top: 12px;
+}
+
+/* Mobile responsive url-container */
+@media (max-width: 480px) {
+  .url-container {
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+  }
 }
 
 /* Add this new style */
 .content-container {
   max-width: 36rem;
   text-align: center;
-  padding: 0 8px;
+  padding: 0 16px;
+  width: 100%;
+}
+
+/* Mobile responsive content container */
+@media (max-width: 768px) {
+  .content-container {
+    max-width: 100%;
+    padding: 0 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .content-container {
+    padding: 0 16px;
+  }
 }
 
 /* Update url-input width to be 100% since container will control max width */
 .url-input {
-  padding: 8px 12px;
+  padding: 10px 14px;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 6px;
   width: 100%;
   background: #f5f5f5;
+  font-size: 14px;
+}
+
+/* Mobile responsive url-input */
+@media (max-width: 480px) {
+  .url-input {
+    padding: 14px 16px;
+    font-size: 16px; /* Prevent zoom on iOS */
+    border-radius: 8px;
+  }
 }
 
 .copy-button {
-  padding: 8px;
+  padding: 10px;
   color: #666;
-  border-radius: 4px;
+  border-radius: 6px;
   transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Mobile responsive copy button */
+@media (max-width: 480px) {
+  .copy-button {
+    padding: 14px;
+    border-radius: 8px;
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .copy-button:hover {
@@ -123,6 +190,14 @@ textarea {
 .copy-button img {
   width: 20px;
   height: 20px;
+}
+
+/* Mobile responsive copy button icon */
+@media (max-width: 480px) {
+  .copy-button img {
+    width: 24px;
+    height: 24px;
+  }
 }
 
 .copy-button.copied {
@@ -157,36 +232,75 @@ textarea {
   width: 100%;
 }
 
+/* Mobile responsive settings section */
+@media (max-width: 768px) {
+  .settings-section {
+    margin-top: 20px;
+  }
+}
+
 .settings-section h2 {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   text-align: center;
   color: #333;
 }
 
 .setting-group {
-  margin-bottom: 16px;
-  padding: 16px;
+  margin-bottom: 14px;
+  padding: 14px;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   background: #fafafa;
 }
 
+/* Mobile responsive setting group */
+@media (max-width: 768px) {
+  .setting-group {
+    padding: 16px;
+    margin-bottom: 16px;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .setting-group {
+    padding: 16px 12px;
+    border-radius: 8px;
+  }
+}
 
 .setting-group label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   font-weight: 500;
   color: #333;
   font-size: 0.95em;
 }
 
+/* Mobile responsive labels */
+@media (max-width: 480px) {
+  .setting-group label {
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+}
+
 .setting-input {
   width: 100%;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 6px;
   background: white;
   font-size: 14px;
+}
+
+/* Mobile responsive setting input */
+@media (max-width: 480px) {
+  .setting-input {
+    padding: 14px 16px;
+    font-size: 16px; /* Prevent zoom on iOS */
+    border-radius: 8px;
+  }
 }
 
 .setting-input:focus {
@@ -197,29 +311,49 @@ textarea {
 
 /* Custom Bangs Styles */
 .custom-bangs-list {
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .no-bangs {
   color: #666;
   font-style: italic;
   text-align: center;
-  padding: 20px;
+  padding: 16px;
 }
 
 .custom-bang-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding: 12px;
   margin-bottom: 8px;
   background: white;
   border: 1px solid #e0e0e0;
-  border-radius: 6px;
+  border-radius: 8px;
+  gap: 12px;
+}
+
+/* Mobile responsive custom bang item */
+@media (max-width: 768px) {
+  .custom-bang-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .custom-bang-item {
+    padding: 14px 12px;
+    border-radius: 12px;
+  }
 }
 
 .bang-info {
   flex: 1;
+  min-width: 0; /* Allow text to wrap */
 }
 
 .bang-info strong {
@@ -227,19 +361,41 @@ textarea {
 }
 
 .bang-url {
-  font-size: 12px;
+  font-size: 11px;
   color: #666;
-  margin-top: 4px;
+  margin-top: 3px;
   word-break: break-all;
+  line-height: 1.3;
+}
+
+/* Mobile responsive bang URL */
+@media (max-width: 480px) {
+  .bang-url {
+    font-size: 13px;
+    line-height: 1.5;
+    margin-top: 4px;
+  }
 }
 
 .delete-bang-btn {
   padding: 6px 12px;
   background: #dc3545;
   color: white;
-  border-radius: 4px;
-  font-size: 12px;
+  border-radius: 6px;
+  font-size: 11px;
   transition: background 0.2s;
+  white-space: nowrap;
+  align-self: flex-start;
+}
+
+/* Mobile responsive delete button */
+@media (max-width: 768px) {
+  .delete-bang-btn {
+    align-self: stretch;
+    padding: 12px 16px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
 }
 
 .delete-bang-btn:hover {
@@ -248,29 +404,62 @@ textarea {
 
 /* Form Styles */
 .add-bang-form {
-  padding: 16px;
+  padding: 14px;
   background: white;
-  border-radius: 6px;
+  border-radius: 8px;
   border: 1px solid #e0e0e0;
 }
 
+/* Mobile responsive form */
+@media (max-width: 768px) {
+  .add-bang-form {
+    padding: 16px;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .add-bang-form {
+    padding: 16px 12px;
+    border-radius: 8px;
+  }
+}
+
 .add-bang-form h4 {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   color: #333;
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* Mobile responsive form row */
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
 }
 
 .form-input {
-  padding: 8px 12px;
+  padding: 10px 14px;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 14px;
+}
+
+/* Mobile responsive form input */
+@media (max-width: 480px) {
+  .form-input {
+    padding: 14px 16px;
+    font-size: 16px; /* Prevent zoom on iOS */
+    border-radius: 8px;
+  }
 }
 
 .form-input:focus {
@@ -284,13 +473,30 @@ textarea {
   margin-bottom: 12px;
 }
 
+/* Mobile responsive full-width input */
+@media (max-width: 480px) {
+  .form-input.full-width {
+    margin-bottom: 16px;
+  }
+}
+
 .primary-button {
   padding: 10px 20px;
   background: #007acc;
   color: white;
-  border-radius: 4px;
+  border-radius: 6px;
   font-weight: 500;
   transition: background 0.2s;
+  width: 100%;
+}
+
+/* Mobile responsive primary button */
+@media (max-width: 480px) {
+  .primary-button {
+    padding: 16px 24px;
+    font-size: 16px;
+    border-radius: 8px;
+  }
 }
 
 .primary-button:hover {
@@ -299,6 +505,71 @@ textarea {
 
 .primary-button:active {
   background: #004785;
+}
+
+/* Add styles for the GitHub link */
+.github-link {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+/* Mobile responsive GitHub link */
+@media (max-width: 480px) {
+  .github-link {
+    margin-top: 24px;
+    font-size: 15px;
+  }
+}
+
+.github-link a {
+  color: #666;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: inline-block;
+}
+
+/* Mobile responsive GitHub link */
+@media (max-width: 480px) {
+  .github-link a {
+    padding: 12px 16px;
+    border-radius: 8px;
+  }
+}
+
+.github-link a:hover {
+  color: #333;
+  background: #f5f5f5;
+}
+
+/* Improve mobile scrolling and prevent horizontal scroll */
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+  }
+  
+  /* Ensure all content stays within viewport */
+  * {
+    max-width: 100%;
+  }
+  
+  /* Restore mobile padding for better spacing */
+  div[style*="min-height: 100vh"] {
+    padding: 20px !important;
+  }
+}
+
+/* Add touch-friendly focus states for mobile */
+@media (max-width: 768px) {
+  button:focus,
+  input:focus,
+  select:focus {
+    outline: 2px solid #007acc;
+    outline-offset: 2px;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -404,31 +675,14 @@ textarea {
   .no-bangs {
     color: #999;
   }
-}
 
-/* Add styles for the GitHub link */
-.github-link {
-  text-align: center;
-  margin-top: 30px; /* Adjust spacing as needed */
-  font-size: 14px;
-}
-
-.github-link a {
-  color: #666; /* Match footer link color */
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.github-link a:hover {
-  color: #333; /* Match footer link hover color */
-}
-
-/* Dark mode styles for the GitHub link */
-@media (prefers-color-scheme: dark) {
+  /* Dark mode GitHub link */
   .github-link a {
-    color: #999; /* Dark mode link color */
+    color: #999;
   }
+  
   .github-link a:hover {
-    color: #eee; /* Dark mode hover color */
+    color: #eee;
+    background: #2a2a2a;
   }
 }
