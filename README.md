@@ -1,13 +1,10 @@
-# Unduckling - Custom duckduckgo bangs and more
-
-
-https://github.com/user-attachments/assets/d1d56012-022b-45cb-8606-5c735eed4864
+# Gulgle - Custom bangs and more
 
 
 DuckDuckGo's bang redirects are too slow. Add the following URL as a custom search engine to your browser. Enables all of DuckDuckGo's bangs to work, but much faster.
 
 ```
-https://unduckling.pages.dev?q=%s
+https://gulgle.guldner.eu?q=%s
 ```
 
 ## How is it that much faster?

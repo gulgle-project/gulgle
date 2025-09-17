@@ -26,13 +26,13 @@ class CustomBangsManager {
   static addCustomBang(bang: CustomBang): void {
     const customBangs = this.getCustomBangs();
     const existingIndex = customBangs.findIndex(b => b.t === bang.t);
-    
+
     if (existingIndex >= 0) {
       customBangs[existingIndex] = bang;
     } else {
       customBangs.push(bang);
     }
-    
+
     this.saveCustomBangs(customBangs);
   }
 
@@ -58,7 +58,7 @@ function renderSettingsUI() {
   const app = document.querySelector<HTMLDivElement>("#app")!;
   const customBangs = CustomBangsManager.getCustomBangs();
   const defaultBang = CustomBangsManager.getDefaultBang();
-  
+
   // Get the current site URL and construct the search URL
   const currentOrigin = window.location.origin;
   const searchUrl = `${currentOrigin}?q=%s`;
@@ -66,8 +66,8 @@ function renderSettingsUI() {
   app.innerHTML = `
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 12px;">
       <div class="content-container">
-        <h1>Und*ckling</h1>
-        <p><a href="https://unduck.link/">Und*ck</a> and <a href="https://duckduckgo.com/">DuckDuckGo's</a> bangs lacks features. Add the following URL as a custom search engine to your browser to use Und*ckling's fast client-side redirects, including <a href="https://duckduckgo.com/bangs">all DuckDuckGo bangs</a>, custom bangs, and configurable default search engine.</p>
+        <h1>Gulgle</h1>
+        <p>Add the following URL as a custom search engine to your browser to use Gulgle's fast client-side redirects, including <a href="https://help.kagi.com/kagi/features/bangs.html">all Kagi bangs</a>, custom bangs, and configurable default search engine.</p>
         
         <div class="url-container"> 
           <input 
@@ -90,18 +90,18 @@ function renderSettingsUI() {
               <option value="ddg" ${defaultBang === "ddg" ? "selected" : ""}>DuckDuckGo (ddg)</option>
               <option value="b" ${defaultBang === "b" ? "selected" : ""}>Bing (b)</option>
               <option value="y" ${defaultBang === "y" ? "selected" : ""}>Yahoo (y)</option>
-              ${customBangs.map(bang => 
-                `<option value="${bang.t}" ${defaultBang === bang.t ? "selected" : ""}>${bang.s} (${bang.t})</option>`
-              ).join("")}
+              ${customBangs.map(bang =>
+    `<option value="${bang.t}" ${defaultBang === bang.t ? "selected" : ""}>${bang.s} (${bang.t})</option>`
+  ).join("")}
             </select>
           </div>
 
           <div class="setting-group">
             <label>Custom Bangs:</label>
             <div class="custom-bangs-list">
-              ${customBangs.length === 0 ? 
-                '<p class="no-bangs">No custom bangs yet. Add one below!</p>' :
-                customBangs.map(bang => `
+              ${customBangs.length === 0 ?
+      '<p class="no-bangs">No custom bangs yet. Add one below!</p>' :
+      customBangs.map(bang => `
                   <div class="custom-bang-item">
                     <div class="bang-info">
                       <strong>!${bang.t}</strong> - ${bang.s}
@@ -110,7 +110,7 @@ function renderSettingsUI() {
                     <button class="delete-bang-btn" data-trigger="${bang.t}">Delete</button>
                   </div>
                 `).join("")
-              }
+    }
             </div>
             
             <div class="add-bang-form">
@@ -136,7 +136,7 @@ function renderSettingsUI() {
 
 function setupEventListeners() {
   const app = document.querySelector<HTMLDivElement>("#app")!;
-  
+
   // Copy button functionality
   const copyButton = app.querySelector<HTMLButtonElement>(".copy-button")!;
   const copyIcon = copyButton.querySelector("img")!;
@@ -177,11 +177,11 @@ function setupEventListeners() {
     try {
       // Test if it's a valid URL
       new URL(url.includes("%s") ? url.replace("%s", "test") : url);
-      
+
       // If URL doesn't contain %s, it's a direct link - no modification needed
       // If URL contains %s, it's a search template - no modification needed
       // Both are valid and will be handled smartly in the redirect logic
-      
+
     } catch (error) {
       alert("Please enter a valid URL");
       return;
@@ -215,7 +215,7 @@ function setupEventListeners() {
 function getBangRedirectUrl(): string | null {
   const url = new URL(window.location.href);
   const query = url.searchParams.get("q")?.trim() ?? "";
-  
+
   if (!query) {
     renderSettingsUI();
     return null;
@@ -223,10 +223,10 @@ function getBangRedirectUrl(): string | null {
 
   const match = query.match(/!(\S+)/i);
   const bangCandidate = match?.[1]?.toLowerCase();
-  
+
   // Check custom bangs first, then default bangs
   const allBangs = CustomBangsManager.getAllBangs();
-  const selectedBang = bangCandidate 
+  const selectedBang = bangCandidate
     ? allBangs.find((b) => b.t === bangCandidate)
     : allBangs.find((b) => b.t === CustomBangsManager.getDefaultBang());
 
@@ -252,10 +252,10 @@ function getBangRedirectUrl(): string | null {
 
   // Smart redirect logic: handle both direct URLs and search templates
   let searchUrl = selectedBang.u;
-  
+
   // Check if the URL contains search placeholders
   const hasSearchPlaceholder = searchUrl.includes("%s") || searchUrl.includes("{{{s}}}");
-  
+
   if (hasSearchPlaceholder) {
     // This is a search template URL
     if (cleanQuery === "") {

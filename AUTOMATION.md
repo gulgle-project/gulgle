@@ -1,6 +1,6 @@
 # Bang List Automation
 
-This project includes automated updates for the bang list from DuckDuckGo's official API.
+This project includes automated updates for the bang list from Kagi's official API.
 
 ## How it works
 
@@ -12,12 +12,12 @@ This project includes automated updates for the bang list from DuckDuckGo's offi
 
 ### 2. Update Script
 - **File**: `scripts/update-bangs.js`
-- **Function**: Fetches bang data from `https://duckduckgo.com/bang.js` and converts it to our format
+- **Function**: Fetches bang data from `"https://raw.githubusercontent.com/kagisearch/bangs/refs/heads/main/data/bangs.json"` and converts it to our format
 - **Output**: Updates `src/bang.ts` with the latest bang definitions
 
 ### 3. Data Format Conversion
 
-**DuckDuckGo API format:**
+**Kagi API format:**
 ```json
 {
   "c": "Tech",
