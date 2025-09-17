@@ -1,7 +1,7 @@
 # Gulgle - Custom bangs and more
 
 
-DuckDuckGo's bang redirects are too slow. Add the following URL as a custom search engine to your browser. Enables all of DuckDuckGo's bangs to work, but much faster.
+DuckDuckGo's bang redirects are too slow. Add the following URL as a custom search engine to your browser. Enables all of  ~~~DuckDuckGo's~~~Kagi's bangs to work, but much faster.
 
 ```
 https://gulgle.guldner.eu?q=%s
@@ -11,15 +11,15 @@ https://gulgle.guldner.eu?q=%s
 
 DuckDuckGo does their redirects server side. Their DNS is...not always great. Result is that it often takes ages.
 
-I solved this by doing all of the work client side. Once you've went to https://unduckling.pages.dev/ once, the JS is all cache'd and will never need to be downloaded again. Your device does the redirects, not me.
+We solved this by doing all of the work client side. Once you've went to https://gulgle.guldner.eu/ once, the JS is all cache'd and will never need to be downloaded again. Your device does the redirects, not me.
 
 ## Features
 
 - Fast Client-Side Redirects: Redirects for bang commands are handled directly in the user's browser, making them faster than server-side redirects.
-- Comprehensive DuckDuckGo Bang Support: The application includes a large list of bang commands sourced from DuckDuckGo's official API.
+- Comprehensive ~~~DuckDuckGo's~~~Kagi's Bang Support: The application includes a large list of bang commands sourced from ~~~DuckDuckGo's~~~Kagi's official list.
 - Custom Bangs: Users can add their own custom bang shortcuts directly within the application's settings, which are stored locally in the browser.
 - Configurable Default Search Engine: Users can choose their preferred default search engine from a list of popular options, including any custom bangs they have added.
-- Automated Bang List Updates: A GitHub Actions workflow is set up to automatically fetch and update the list of default bangs from DuckDuckGo's API on a monthly basis.
+- Automated Bang List Updates: A GitHub Actions workflow is set up to automatically fetch and update the list of default bangs from ~~~DuckDuckGo~~~Kagi on a monthly basis.
 
 
 

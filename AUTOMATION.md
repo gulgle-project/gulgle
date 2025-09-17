@@ -1,6 +1,6 @@
 # Bang List Automation
 
-This project includes automated updates for the bang list from Kagi's official API.
+This project includes automated updates for the bang list from Kagi.
 
 ## How it works
 
@@ -17,7 +17,7 @@ This project includes automated updates for the bang list from Kagi's official A
 
 ### 3. Data Format Conversion
 
-**Kagi API format:**
+**Kagi bang format:**
 ```json
 {
   "c": "Tech",

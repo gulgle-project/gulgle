@@ -14,7 +14,7 @@ const BANG_URL =
 const BANG_FILE_PATH = path.join(__dirname, "..", "src", "bang.ts");
 
 /**
- * Fetch data from Kagi's bang.js API
+ * Fetch data from Kagi
  */
 function fetchBangData() {
 	return new Promise((resolve, reject) => {
