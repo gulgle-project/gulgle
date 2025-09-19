@@ -1,7 +1,7 @@
 import "./global.css";
 import { doRedirect } from "./redirect";
 
-(async function() {
+(async () => {
   if (!await doRedirect()) {
     (await import("./render")).renderSettingsUI();
   }

@@ -1,6 +1,14 @@
 import type { bangs } from "./bang";
-import { getCustomBangs,setDefaultBang,getAllBangs,addCustomBang,removeCustomBang,getDefaultBangOrStore,getBangs } from "./bang-manager";
-import { CustomBang } from "./types";
+import {
+  addCustomBang,
+  getAllBangs,
+  getBangs,
+  getCustomBangs,
+  getDefaultBangOrStore,
+  removeCustomBang,
+  setDefaultBang,
+} from "./bang-manager";
+import type { CustomBang } from "./types";
 
 export function renderSettingsUI() {
   const app = document.querySelector<HTMLDivElement>("#app")!;
@@ -40,9 +48,11 @@ export function renderSettingsUI() {
           <div class="setting-group">
             <label>Custom Bangs:</label>
             <div class="custom-bangs-list">
-              ${customBangs.length === 0 ?
-      '<p class="no-bangs">No custom bangs yet. Add one below!</p>' :
-      customBangs.map(bang => `
+              ${customBangs.length === 0
+      ? '<p class="no-bangs">No custom bangs yet. Add one below!</p>'
+      : customBangs
+        .map(
+          (bang) => `
                   <div class="custom-bang-item">
                     <div class="bang-info">
                       <strong>!${bang.t}</strong> - ${bang.s}
@@ -50,7 +60,9 @@ export function renderSettingsUI() {
                     </div>
                     <button class="delete-bang-btn" data-trigger="${bang.t}">Delete</button>
                   </div>
-                `).join("")
+                `,
+        )
+        .join("")
     }
             </div>
             
@@ -66,7 +78,7 @@ export function renderSettingsUI() {
           </div>
         </div>
         <p class="github-link">
-          <a href="https://github.com/dev-bhaskar8/unduckling" target="_blank">View on GitHub</a>
+          <a href="https://github.com/hetzgu/gulgle" target="_blank">View on GitHub</a>
         </p>
       </div>
     </div>
@@ -87,7 +99,9 @@ function levenshtein(a: string, b: string) {
     [a, b] = [b, a];
   }
 
-  let prev = Array(b.length + 1).fill(0).map((_, i) => i);
+  let prev = Array(b.length + 1)
+    .fill(0)
+    .map((_, i) => i);
   let curr = new Array(b.length + 1);
 
   for (let i = 1; i <= a.length; i++) {
@@ -104,8 +118,8 @@ function levenshtein(a: string, b: string) {
   return prev[b.length];
 }
 
-function score(a: CustomBang | typeof bangs[0], value: string): number {
-  return Math.min(levenshtein(a.t, value) * 1, levenshtein(a.s, value) * 2)
+function score(a: CustomBang | (typeof bangs)[0], value: string): number {
+  return Math.min(levenshtein(a.t, value) * 1, levenshtein(a.s, value) * 2);
 }
 
 function setupEventListeners() {
@@ -127,7 +141,8 @@ function setupEventListeners() {
   // Default bang selection
   let setThroughDropDown = true;
   const autoComplete = app.querySelector<HTMLDivElement>("#autocomplete-list")!;
-  const defaultBangInput = app.querySelector<HTMLInputElement>("#default-bang")!;
+  const defaultBangInput =
+    app.querySelector<HTMLInputElement>("#default-bang")!;
   // defaultBangInput.addEventListener("blur", () => {
   //   if (defaultBangInput.classList.contains("error")) {
   //     defaultBangInput.value = getDefaultBangOrStore().t;
@@ -152,8 +167,13 @@ function setupEventListeners() {
       defaultBangInput.classList.add("error");
     }
 
-    const bangs = (await getAllBangs());
-    const matches = bangs.filter(b => b.t.toLowerCase().includes(value) || b.s.toLowerCase().includes(value))
+    const bangs = await getAllBangs();
+    const matches = bangs
+      .filter(
+        (b) =>
+          b.t.toLowerCase().includes(value) ||
+          b.s.toLowerCase().includes(value),
+      )
       .sort((a, b) => score(a, value) - score(b, value))
       .splice(0, 10);
 
@@ -162,11 +182,11 @@ function setupEventListeners() {
       return;
     }
 
-    matches.forEach(match => {
-      const item = document.createElement('div');
-      item.classList.add('autocomplete-item');
+    matches.forEach((match) => {
+      const item = document.createElement("div");
+      item.classList.add("autocomplete-item");
       item.textContent = `(!${match.t}) ${match.s} (${match.d})${"c" in match ? " (Custom)" : ""}`;
-      item.addEventListener('click', () => {
+      item.addEventListener("click", () => {
         defaultBangInput.classList.remove("error");
         defaultBangInput.value = match.t;
         autoComplete.style.display = "none";
@@ -190,7 +210,7 @@ function setupEventListeners() {
       return;
     }
 
-    if ((await getBangs()).find(b => b.t == triggerInput.value)) {
+    if ((await getBangs()).find((b) => b.t === triggerInput.value)) {
       triggerInput.classList.add("error");
       return;
     }
@@ -217,20 +237,21 @@ function setupEventListeners() {
       // If URL doesn't contain %s, it's a direct link - no modification needed
       // If URL contains %s, it's a search template - no modification needed
       // Both are valid and will be handled smartly in the redirect logic
-
-    } catch (error) {
+    } catch (_error) {
       alert("Please enter a valid URL");
       return;
     }
 
-    const domain = new URL(finalUrl.includes("%s") ? finalUrl.replace("%s", "test") : finalUrl).hostname;
+    const domain = new URL(
+      finalUrl.includes("%s") ? finalUrl.replace("%s", "test") : finalUrl,
+    ).hostname;
 
     addCustomBang({
       t: trigger,
       s: name,
       u: finalUrl,
       d: domain,
-      c: true
+      c: true,
     });
 
     // Refresh the UI
@@ -238,7 +259,7 @@ function setupEventListeners() {
   });
 
   // Delete custom bangs
-  app.querySelectorAll(".delete-bang-btn").forEach(btn => {
+  app.querySelectorAll(".delete-bang-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       const trigger = (e.target as HTMLButtonElement).dataset.trigger!;
       if (confirm(`Delete custom bang !${trigger}?`)) {
