@@ -1,4 +1,3 @@
-
 // Types
 export type CustomBang = {
   t: string; // trigger
@@ -6,4 +5,4 @@ export type CustomBang = {
   u: string; // url template
   d: string; // domain
   c: true;
-}
+};

@@ -1,0 +1,13 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll.biome": "explicit"
+  },
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "git.rebaseWhenSync": true,
+  "npm.packageManager": "pnpm",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+}
