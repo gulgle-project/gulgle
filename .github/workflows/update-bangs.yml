@@ -6,7 +6,7 @@ on:
     - cron: "0 2 1 * *"
   workflow_dispatch: # Allow manual triggering
   push:
-    branches: [main, master, vaasmain]
+    branches: [main]
     paths: [".github/workflows/update-bangs.yml"] # Run when this workflow is updated
 
 jobs:
