@@ -74,12 +74,12 @@ function generateBangFileContent(bangs) {
       const escapedU = bang.u.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
       const escapedD = bang.d.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 
-      return `{
-  t: "${escapedT}",
-  s: "${escapedS}",
-  u: "${escapedU}",
-  d: "${escapedD}"
-}`;
+      return `  {
+    t: "${escapedT}",
+    s: "${escapedS}",
+    u: "${escapedU}",
+    d: "${escapedD}"
+  }`;
     })
     .join(",\n");
 
