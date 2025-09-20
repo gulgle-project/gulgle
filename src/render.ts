@@ -8,6 +8,8 @@ import {
   getDefaultBangOrStore,
   removeCustomBang,
   setDefaultBang,
+  exportSettings,
+  importSettings,
 } from "./bang-manager";
 import type { Bang } from "./types";
 
@@ -87,6 +89,18 @@ export function renderSettingsUI() {
               </div>
               <input type="text" id="bang-url" placeholder="URL (direct link or search template with %s)" class="form-input full-width" />
               <button id="add-bang-btn" class="primary-button">Add Bang</button>
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <label>Import/Export Settings:</label>
+            <div class="import-export-section">
+              <div class="form-row">
+                <button id="export-settings-btn" class="secondary-button">Export Settings</button>
+                <button id="import-settings-btn" class="secondary-button">Import Settings</button>
+              </div>
+              <input type="file" id="import-file-input" accept=".json" style="display: none;" />
+              <div id="import-export-status" class="status-message" style="display: none;"></div>
             </div>
           </div>
         </div>
@@ -201,10 +215,16 @@ function setupEventListeners() {
       return;
     }
 
-    matches.forEach((match) => {
+    matches.forEach((match, index) => {
       const item = document.createElement("div");
       item.classList.add("autocomplete-item");
-      item.textContent = `(!${match.t}) ${match.s} (${match.d})${"c" in match ? " (Custom)" : ""}`;
+
+      // Build the display text with additional triggers if they exist
+      const additionalTriggers = match.ts && match.ts.length > 0
+        ? ` [${match.ts.join(", ")}]`
+        : "";
+
+      item.textContent = `(!${match.t}) ${match.s} (${match.d})${additionalTriggers}${"c" in match ? " (Custom)" : ""}`;
       item.addEventListener("click", () => {
         defaultBangInput.classList.remove("error");
         defaultBangInput.value = match.t;
@@ -213,6 +233,12 @@ function setupEventListeners() {
         setDefaultBang(match);
       });
       autoComplete.appendChild(item);
+
+      // Add hr between entries (but not after the last one)
+      if (index < matches.length - 1) {
+        const hr = document.createElement("hr");
+        autoComplete.appendChild(hr);
+      }
     });
     autoComplete.style.display = "block";
     // setDefaultBang((await getAllBangs()).find(b => b.t == defaultBangInput.value)!!);
@@ -287,4 +313,72 @@ function setupEventListeners() {
       }
     });
   });
+
+  // Export settings
+  const exportBtn = safeQuerySelector<HTMLButtonElement>(app, "#export-settings-btn");
+  exportBtn.addEventListener("click", () => {
+    try {
+      const settings = exportSettings();
+      const dataStr = JSON.stringify(settings, null, 2);
+      const dataBlob = new Blob([dataStr], { type: "application/json" });
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(dataBlob);
+      link.download = `gulgle-settings-${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+
+      showStatusMessage("Settings exported successfully!", "success");
+    } catch (error) {
+      showStatusMessage(`Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`, "error");
+    }
+  });
+
+  // Import settings
+  const importBtn = safeQuerySelector<HTMLButtonElement>(app, "#import-settings-btn");
+  const fileInput = safeQuerySelector<HTMLInputElement>(app, "#import-file-input");
+
+  importBtn.addEventListener("click", () => {
+    fileInput.click();
+  });
+
+  fileInput.addEventListener("change", (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const settingsData = JSON.parse(event.target?.result as string);
+        const result = importSettings(settingsData);
+
+        if (result.success) {
+          showStatusMessage(result.message, "success");
+          // Refresh the UI to show imported settings
+          setTimeout(() => renderSettingsUI(), 1000);
+        } else {
+          showStatusMessage(result.message, "error");
+        }
+      } catch (error) {
+        showStatusMessage(`Failed to parse settings file: ${error instanceof Error ? error.message : 'Unknown error'}`, "error");
+      }
+    };
+    reader.readAsText(file);
+
+    // Reset file input
+    fileInput.value = "";
+  });
+}
+
+function showStatusMessage(message: string, type: "success" | "error") {
+  const app = safeQuerySelector<HTMLDivElement>(document, "#app");
+  const statusElement = safeQuerySelector<HTMLDivElement>(app, "#import-export-status");
+
+  statusElement.textContent = message;
+  statusElement.className = `status-message ${type}`;
+  statusElement.style.display = "block";
+
+  // Hide the message after 5 seconds
+  setTimeout(() => {
+    statusElement.style.display = "none";
+  }, 5000);
 }

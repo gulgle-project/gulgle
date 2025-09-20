@@ -1,10 +1,11 @@
-import type { CustomBang, Bang } from "./types";
+import { isBang } from "./type-guards";
+import type { CustomBang, Bang, BuiltInBang, ExportedSettings } from "./types";
 
 // Custom bangs management
 const STORAGE_KEY = "custom-bangs";
 const DEFAULT_BANG_KEY = "default-bang";
 
-const DEFAULT: Bang = {
+const DEFAULT: BuiltInBang = {
   t: "g",
   s: "Google",
   u: "https://www.google.com/search?q={{{s}}}",
@@ -38,11 +39,11 @@ export function removeCustomBang(trigger: string): void {
   saveCustomBangs(customBangs);
 }
 
-export function getDefaultBang(): Bang | null {
+export function getDefaultBang(): Bang | undefined {
   const result = localStorage.getItem(DEFAULT_BANG_KEY);
 
-  if (!result) {
-    return null;
+  if (!result || !isBang(result)) {
+    return undefined;
   }
 
   return JSON.parse(result);
@@ -69,4 +70,46 @@ export async function getAllBangs(): Promise<Bang[]> {
 
 export async function getBangs(): Promise<Bang[]> {
   return (await import("./bang")).bangs;
+}
+
+export function exportSettings(): ExportedSettings {
+  return {
+    customBangs: getCustomBangs(),
+    defaultBang: getDefaultBang(),
+    exportedAt: new Date().toISOString(),
+    version: "1.0"
+  };
+}
+
+export function importSettings(settingsData: ExportedSettings): { success: boolean; message: string } {
+  try {
+    // Validate the data structure
+    if (!settingsData || typeof settingsData !== 'object') {
+      return { success: false, message: "Invalid settings data format" };
+    }
+
+    if (!Array.isArray(settingsData.customBangs)) {
+      return { success: false, message: "Invalid custom bangs data" };
+    }
+
+    // Validate custom bangs structure
+    for (const bang of settingsData.customBangs) {
+      if (!bang.t || !bang.s || !bang.u || !bang.d) {
+        return { success: false, message: "Invalid custom bang structure" };
+      }
+    }
+
+    // Validate default bang structure
+    if (settingsData.defaultBang && !isBang(settingsData.defaultBang)) {
+      return { success: false, message: "Invalid default bang structure" };
+    }
+
+    // Import the settings
+    saveCustomBangs(settingsData.customBangs);
+    settingsData.defaultBang && setDefaultBang(settingsData.defaultBang);
+
+    return { success: true, message: `Successfully imported ${settingsData.customBangs.length} custom bangs and default search engine` };
+  } catch (error) {
+    return { success: false, message: `Import failed: ${error instanceof Error ? error.message : 'Unknown error'}` };
+  }
 }
