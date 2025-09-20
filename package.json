@@ -12,10 +12,12 @@
     "biome:write": "biome check . --write",
     "biome:ci": "biome ci .",
     "typecheck": "tsc --noEmit",
-    "update-bangs": "node scripts/update-bangs.js"
+    "update-bangs": "tsx scripts/update-bangs.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.4",
+    "@types/node": "^24.5.2",
+    "tsx": "^4.20.5",
     "typescript": "~5.7.3",
     "vite": "^6.3.6"
   },
