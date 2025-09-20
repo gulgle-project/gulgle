@@ -1,3 +1,5 @@
+import clipboardSvg from "/clipboard.svg";
+import clipboardCheckSvg from "/clipboard-check.svg";
 import type { bangs } from "./bang";
 import {
   addCustomBang,
@@ -8,12 +10,22 @@ import {
   removeCustomBang,
   setDefaultBang,
 } from "./bang-manager";
-import clipboardSvg from "/clipboard.svg";
-import clipboardCheckSvg from "/clipboard-check.svg";
 import type { CustomBang } from "./types";
 
+function safeQuerySelector<T extends Element>(
+  parent: Document | Element,
+  selector: string,
+  errorMessage?: string,
+): T {
+  const element = parent.querySelector<T>(selector);
+  if (!element) {
+    throw new Error(errorMessage || `Element not found: ${selector}`);
+  }
+  return element;
+}
+
 export function renderSettingsUI() {
-  const app = document.querySelector<HTMLDivElement>("#app")!;
+  const app = safeQuerySelector<HTMLDivElement>(document, "#app");
   const customBangs = getCustomBangs();
   const defaultBang = getDefaultBangOrStore();
 
@@ -26,13 +38,13 @@ export function renderSettingsUI() {
       <div class="content-container">
         <h1>Gulgle</h1>
         <p>Add the following URL as a custom search engine to your browser to use Gulgle's fast client-side redirects, including <a href="https://kbe.smaertness.net/">all Kagi bangs</a>, custom bangs, and configurable default search engine.</p>
-        
-        <div class="url-container"> 
-          <input 
-            type="text" 
+
+        <div class="url-container">
+          <input
+            type="text"
             class="url-input"
             value="${searchUrl}"
-            readonly 
+            readonly
           />
           <button class="copy-button">
             <img src="${clipboardSvg}" alt="Copy" />
@@ -40,7 +52,7 @@ export function renderSettingsUI() {
         </div>
 
         <div class="settings-section">
-          
+
           <div class="setting-group">
             <label for="default-bang-select">Default Search Engine:</label>
             <input type="text" id="default-bang" class="setting-input" value="${defaultBang.t}" />
@@ -67,7 +79,7 @@ export function renderSettingsUI() {
         .join("")
     }
             </div>
-            
+
             <div class="add-bang-form">
               <label>Add Custom Bang</label>
               <div class="form-row">
@@ -125,14 +137,12 @@ function score(a: CustomBang | (typeof bangs)[0], value: string): number {
 }
 
 function setupEventListeners() {
-  const app = document.querySelector<HTMLDivElement>("#app")!;
+  const app = safeQuerySelector<HTMLDivElement>(document, "#app");
 
   // Copy button functionality
-  const copyButton = app.querySelector<HTMLButtonElement>(".copy-button")!;
-  const copyIcon = copyButton.querySelector("img")!;
-  const urlInput = app.querySelector<HTMLInputElement>(".url-input")!;
-
-  copyButton.addEventListener("click", async () => {
+  const copyButton = safeQuerySelector<HTMLButtonElement>(app, ".copy-button");
+  const urlInput = safeQuerySelector<HTMLInputElement>(app, ".url-input");
+  const copyIcon = safeQuerySelector<HTMLImageElement>(copyButton, "img"); copyButton.addEventListener("click", async () => {
     await navigator.clipboard.writeText(urlInput.value);
     copyIcon.src = clipboardCheckSvg;
     setTimeout(() => {
@@ -142,9 +152,8 @@ function setupEventListeners() {
 
   // Default bang selection
   let setThroughDropDown = true;
-  const autoComplete = app.querySelector<HTMLDivElement>("#autocomplete-list")!;
-  const defaultBangInput =
-    app.querySelector<HTMLInputElement>("#default-bang")!;
+  const autoComplete = safeQuerySelector<HTMLDivElement>(app, "#autocomplete-list");
+  const defaultBangInput = safeQuerySelector<HTMLInputElement>(app, "#default-bang");
   // defaultBangInput.addEventListener("blur", () => {
   //   if (defaultBangInput.classList.contains("error")) {
   //     defaultBangInput.value = getDefaultBangOrStore().t;
@@ -171,11 +180,7 @@ function setupEventListeners() {
 
     const bangs = await getAllBangs();
     const matches = bangs
-      .filter(
-        (b) =>
-          b.t.toLowerCase().includes(value) ||
-          b.s.toLowerCase().includes(value),
-      )
+      .filter((b) => b.t.toLowerCase().includes(value) || b.s.toLowerCase().includes(value))
       .sort((a, b) => score(a, value) - score(b, value))
       .splice(0, 10);
 
@@ -202,12 +207,10 @@ function setupEventListeners() {
   });
 
   // Add custom bang
-  const addBangBtn = app.querySelector<HTMLButtonElement>("#add-bang-btn")!;
-  const triggerInput = app.querySelector<HTMLInputElement>("#bang-trigger")!;
-  const nameInput = app.querySelector<HTMLInputElement>("#bang-name")!;
-  const urlInput2 = app.querySelector<HTMLInputElement>("#bang-url")!;
-
-  triggerInput.addEventListener("input", async () => {
+  const addBangBtn = safeQuerySelector<HTMLButtonElement>(app, "#add-bang-btn");
+  const triggerInput = safeQuerySelector<HTMLInputElement>(app, "#bang-trigger");
+  const nameInput = safeQuerySelector<HTMLInputElement>(app, "#bang-name");
+  const urlInput2 = safeQuerySelector<HTMLInputElement>(app, "#bang-url"); triggerInput.addEventListener("input", async () => {
     if (!triggerInput.value) {
       return;
     }
@@ -231,7 +234,7 @@ function setupEventListeners() {
     }
 
     // Smart URL validation - accept both direct URLs and search templates
-    let finalUrl = url;
+    const finalUrl = url;
     try {
       // Test if it's a valid URL
       new URL(url.includes("%s") ? url.replace("%s", "test") : url);
@@ -244,9 +247,7 @@ function setupEventListeners() {
       return;
     }
 
-    const domain = new URL(
-      finalUrl.includes("%s") ? finalUrl.replace("%s", "test") : finalUrl,
-    ).hostname;
+    const domain = new URL(finalUrl.includes("%s") ? finalUrl.replace("%s", "test") : finalUrl).hostname;
 
     addCustomBang({
       t: trigger,
@@ -263,7 +264,11 @@ function setupEventListeners() {
   // Delete custom bangs
   app.querySelectorAll(".delete-bang-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
-      const trigger = (e.target as HTMLButtonElement).dataset.trigger!;
+      const trigger = (e.target as HTMLButtonElement).dataset.trigger;
+      if (!trigger) {
+        console.error("Trigger data attribute not found");
+        return;
+      }
       if (confirm(`Delete custom bang !${trigger}?`)) {
         removeCustomBang(trigger);
         renderSettingsUI();
