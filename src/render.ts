@@ -8,6 +8,8 @@ import {
   removeCustomBang,
   setDefaultBang,
 } from "./bang-manager";
+import clipboardSvg from "/clipboard.svg";
+import clipboardCheckSvg from "/clipboard-check.svg";
 import type { CustomBang } from "./types";
 
 export function renderSettingsUI() {
@@ -33,7 +35,7 @@ export function renderSettingsUI() {
             readonly 
           />
           <button class="copy-button">
-            <img src="/clipboard.svg" alt="Copy" />
+            <img src="${clipboardSvg}" alt="Copy" />
           </button>
         </div>
 
@@ -132,10 +134,10 @@ function setupEventListeners() {
 
   copyButton.addEventListener("click", async () => {
     await navigator.clipboard.writeText(urlInput.value);
-    copyIcon.src = "/clipboard-check.svg";
+    copyIcon.src = clipboardCheckSvg;
     setTimeout(() => {
-      copyIcon.src = "/clipboard.svg";
-    }, 2000);
+      copyIcon.src = clipboardSvg;
+    }, 1000);
   });
 
   // Default bang selection
