@@ -38,7 +38,7 @@ export function renderSettingsUI() {
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 12px;">
       <div class="content-container">
         <h1>Gulgle</h1>
-        <p>Add the following URL as a custom search engine to your browser to use Gulgle's fast client-side redirects, including <a href="https://kbe.smaertness.net/">all Kagi bangs</a>, custom bangs, and configurable default search engine.</p>
+        <p>Add the following URL as a custom search engine to your browser to use Gulgle's fast client-side redirects, including <a href="https://kbe.smaertness.net/">all Kagi bangs</a>, custom bangs, and a configurable default search engine.</p>
 
         <div class="url-container">
           <input
@@ -352,9 +352,8 @@ function setupEventListeners() {
         const result = importSettings(settingsData);
 
         if (result.success) {
+          renderSettingsUI();
           showStatusMessage(result.message, "success");
-          // Refresh the UI to show imported settings
-          setTimeout(() => renderSettingsUI(), 1000);
         } else {
           showStatusMessage(result.message, "error");
         }

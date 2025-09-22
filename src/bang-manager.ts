@@ -42,11 +42,19 @@ export function removeCustomBang(trigger: string): void {
 export function getDefaultBang(): Bang | undefined {
   const result = localStorage.getItem(DEFAULT_BANG_KEY);
 
-  if (!result || !isBang(result)) {
+  if (!result) {
     return undefined;
   }
 
-  return JSON.parse(result);
+  try {
+    const parsed = JSON.parse(result);
+    if (!isBang(parsed)) {
+      return undefined;
+    }
+    return parsed;
+  } catch {
+    return undefined;
+  }
 }
 
 export function getDefaultBangOrStore(): Bang {
