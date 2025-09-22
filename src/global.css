@@ -309,6 +309,48 @@ input.error {
 }
 
 /* Custom Bangs Styles */
+.collapsible-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
+
+.collapsible-header:hover {
+  background: #e9ecef;
+}
+
+.collapsible-header span:first-child {
+  font-weight: 500;
+  color: #333;
+}
+
+.collapse-icon {
+  font-size: 14px;
+  color: #666;
+  transition: transform 0.2s ease;
+}
+
+.collapsible-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  max-height: 2000px; /* Large enough to accommodate content */
+  opacity: 1;
+}
+
+.collapsible-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+  margin-bottom: 0;
+}
+
 .custom-bangs-list {
   margin-bottom: 14px;
 }
@@ -324,7 +366,7 @@ input.error {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 12px;
+  padding: 14px;
   margin-bottom: 8px;
   background: white;
   border: 1px solid #e0e0e0;
@@ -359,6 +401,80 @@ input.error {
   color: #007acc;
 }
 
+.bang-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.action-display {
+  display: flex;
+  gap: 8px;
+}
+
+.bang-edit {
+  width: 100%;
+  padding: 0 0 14px 0;
+}
+
+.edit-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.edit-bang-btn,
+.delete-bang-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.edit-bang-btn {
+  background: #f5f5f5;
+  border-color: #ddd;
+  color: #333;
+}
+
+.edit-bang-btn:hover {
+  background: #e9e9e9;
+  border-color: #ccc;
+}
+
+/* Mobile responsive edit forms */
+@media (max-width: 768px) {
+  .bang-edit {
+    padding: 16px 0;
+  }
+
+  .bang-actions {
+    width: 100%;
+  }
+
+  .action-display {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .edit-buttons {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bang-edit {
+    padding: 16px 0;
+  }
+}
+
 .bang-url {
   font-size: 11px;
   color: #666;
@@ -377,20 +493,15 @@ input.error {
 }
 
 .delete-bang-btn {
-  padding: 6px 12px;
   background: #dc3545;
+  border-color: #dc3545;
   color: white;
-  border-radius: 6px;
-  font-size: 11px;
-  transition: background 0.2s;
-  white-space: nowrap;
-  align-self: flex-start;
 }
 
-/* Mobile responsive delete button */
+/* Mobile responsive action buttons */
 @media (max-width: 768px) {
+  .edit-bang-btn,
   .delete-bang-btn {
-    align-self: stretch;
     padding: 12px 16px;
     font-size: 14px;
     border-radius: 8px;
@@ -399,6 +510,7 @@ input.error {
 
 .delete-bang-btn:hover {
   background: #c82333;
+  border-color: #c82333;
 }
 
 /* Form Styles */
@@ -704,6 +816,48 @@ input.error {
   .custom-bang-item {
     background: #2a2a2a;
     border-color: #444;
+  }
+
+  .edit-trigger,
+  .edit-name,
+  .edit-url {
+    background: #1a1a1a;
+    border-color: #555;
+    color: #ddd;
+  }
+
+  .edit-trigger:focus,
+  .edit-name:focus,
+  .edit-url:focus {
+    border-color: #007acc;
+  }
+
+  .edit-bang-btn {
+    background: #333;
+    border-color: #555;
+    color: #ddd;
+  }
+
+  .edit-bang-btn:hover {
+    background: #444;
+    border-color: #666;
+  }
+
+  .collapsible-header {
+    background: #2a2a2a;
+    border-color: #444;
+  }
+
+  .collapsible-header:hover {
+    background: #333;
+  }
+
+  .collapsible-header span:first-child {
+    color: #ddd;
+  }
+
+  .collapse-icon {
+    color: #999;
   }
 
   .bang-info strong {

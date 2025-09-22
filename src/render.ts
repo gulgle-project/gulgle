@@ -61,34 +61,58 @@ export function renderSettingsUI() {
           </div>
 
           <div class="setting-group">
-            <label>Custom Bangs:</label>
-            <div class="custom-bangs-list">
-              ${customBangs.length === 0
+            <div class="collapsible-header" id="custom-bangs-header">
+              <span>Custom Bangs:</span>
+              <span class="collapse-icon">▼</span>
+            </div>
+            <div class="collapsible-content" id="custom-bangs-content">
+              <div class="custom-bangs-list">
+                ${customBangs.length === 0
       ? '<p class="no-bangs">No custom bangs yet. Add one below!</p>'
       : customBangs
         .map(
           (bang) => `
-                  <div class="custom-bang-item">
-                    <div class="bang-info">
-                      <strong>!${bang.t}</strong> - ${bang.s}
-                      <div class="bang-url">${bang.u}</div>
+                    <div class="custom-bang-item" data-trigger="${bang.t}">
+                      <div class="bang-info">
+                        <div class="bang-display" id="display-${bang.t}">
+                          <strong>!${bang.t}</strong> - ${bang.s}
+                          <div class="bang-url">${bang.u}</div>
+                        </div>
+                        <div class="bang-edit" id="edit-${bang.t}" style="display: none;">
+                          <label>Edit Custom Bang</label>
+                          <div class="form-row">
+                            <input type="text" class="edit-trigger form-input" value="${bang.t}" placeholder="Trigger (e.g., 'gh')" />
+                            <input type="text" class="edit-name form-input" value="${bang.s}" placeholder="Name (e.g., 'GitHub')" />
+                          </div>
+                          <input type="text" class="edit-url form-input full-width" value="${bang.u}" placeholder="URL (direct link or search template with %s)" />
+                          <div class="edit-buttons">
+                            <button class="save-bang-btn primary-button" data-trigger="${bang.t}">Save</button>
+                            <button class="cancel-edit-btn secondary-button" data-trigger="${bang.t}">Cancel</button>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="bang-actions">
+                        <div class="action-display" id="actions-display-${bang.t}">
+                          <button class="edit-bang-btn" data-trigger="${bang.t}">Edit</button>
+                          <button class="delete-bang-btn" data-trigger="${bang.t}">Delete</button>
+                        </div>
+                      </div>
                     </div>
-                    <button class="delete-bang-btn" data-trigger="${bang.t}">Delete</button>
-                  </div>
-                `,
+                  `,
         )
         .join("")
     }
-            </div>
-
-            <div class="add-bang-form">
-              <label>Add Custom Bang</label>
-              <div class="form-row">
-                <input type="text" id="bang-trigger" placeholder="Trigger (e.g., 'gh')" class="form-input" />
-                <input type="text" id="bang-name" placeholder="Name (e.g., 'GitHub')" class="form-input" />
               </div>
-              <input type="text" id="bang-url" placeholder="URL (direct link or search template with %s)" class="form-input full-width" />
-              <button id="add-bang-btn" class="primary-button">Add Bang</button>
+
+              <div class="add-bang-form">
+                <label>Add Custom Bang</label>
+                <div class="form-row">
+                  <input type="text" id="bang-trigger" placeholder="Trigger (e.g., 'gh')" class="form-input" />
+                  <input type="text" id="bang-name" placeholder="Name (e.g., 'GitHub')" class="form-input" />
+                </div>
+                <input type="text" id="bang-url" placeholder="URL (direct link or search template with %s)" class="form-input full-width" />
+                <button id="add-bang-btn" class="primary-button">Add Bang</button>
+              </div>
             </div>
           </div>
 
@@ -312,6 +336,110 @@ function setupEventListeners() {
         renderSettingsUI();
       }
     });
+  });
+
+  // Edit custom bangs
+  app.querySelectorAll(".edit-bang-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const trigger = (e.target as HTMLButtonElement).dataset.trigger;
+      if (!trigger) {
+        console.error("Trigger data attribute not found");
+        return;
+      }
+
+      // Show edit mode
+      const displayElement = safeQuerySelector<HTMLDivElement>(app, `#display-${trigger}`);
+      const editElement = safeQuerySelector<HTMLDivElement>(app, `#edit-${trigger}`);
+      const actionsDisplay = safeQuerySelector<HTMLDivElement>(app, `#actions-display-${trigger}`);
+
+      displayElement.style.display = "none";
+      editElement.style.display = "block";
+      actionsDisplay.style.display = "none";
+    });
+  });
+
+  // Save edited custom bangs
+  app.querySelectorAll(".save-bang-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const trigger = (e.target as HTMLButtonElement).dataset.trigger;
+      if (!trigger) {
+        console.error("Trigger data attribute not found");
+        return;
+      }
+
+      const editElement = safeQuerySelector<HTMLDivElement>(app, `#edit-${trigger}`);
+      const newTrigger = (editElement.querySelector(".edit-trigger") as HTMLInputElement).value.trim().toLowerCase();
+      const newName = (editElement.querySelector(".edit-name") as HTMLInputElement).value.trim();
+      const newUrl = (editElement.querySelector(".edit-url") as HTMLInputElement).value.trim();
+
+      if (!newTrigger || !newName || !newUrl) {
+        alert("Please fill in all fields");
+        return;
+      }
+
+      // Validate URL
+      try {
+        new URL(newUrl.includes("%s") ? newUrl.replace("%s", "test") : newUrl);
+      } catch (_error) {
+        alert("Please enter a valid URL");
+        return;
+      }
+
+      const domain = new URL(newUrl.includes("%s") ? newUrl.replace("%s", "test") : newUrl).hostname;
+
+      // If trigger changed, remove old one first
+      if (trigger !== newTrigger) {
+        removeCustomBang(trigger);
+      }
+
+      addCustomBang({
+        t: newTrigger,
+        s: newName,
+        u: newUrl,
+        d: domain,
+        c: true,
+      });
+
+      // Refresh the UI
+      renderSettingsUI();
+    });
+  });
+
+  // Cancel edit custom bangs
+  app.querySelectorAll(".cancel-edit-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const trigger = (e.target as HTMLButtonElement).dataset.trigger;
+      if (!trigger) {
+        console.error("Trigger data attribute not found");
+        return;
+      }
+
+      // Show display mode
+      const displayElement = safeQuerySelector<HTMLDivElement>(app, `#display-${trigger}`);
+      const editElement = safeQuerySelector<HTMLDivElement>(app, `#edit-${trigger}`);
+      const actionsDisplay = safeQuerySelector<HTMLDivElement>(app, `#actions-display-${trigger}`);
+
+      displayElement.style.display = "block";
+      editElement.style.display = "none";
+      actionsDisplay.style.display = "flex";
+    });
+  });
+
+  // Custom bangs collapsible functionality
+  const customBangsHeader = safeQuerySelector<HTMLDivElement>(app, "#custom-bangs-header");
+  const customBangsContent = safeQuerySelector<HTMLDivElement>(app, "#custom-bangs-content");
+  const collapseIcon = safeQuerySelector<HTMLSpanElement>(customBangsHeader, ".collapse-icon");
+
+  customBangsHeader.addEventListener("click", () => {
+    const isCollapsed = customBangsContent.classList.contains("collapsed");
+
+    if (isCollapsed) {
+      customBangsContent.classList.remove("collapsed");
+      collapseIcon.textContent = "▼";
+    } else {
+      customBangsContent.classList.add("collapsed");
+      collapseIcon.textContent = "▶";
+    }
   });
 
   // Export settings
