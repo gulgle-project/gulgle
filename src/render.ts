@@ -13,7 +13,19 @@ import {
 } from "./bang-manager";
 import type { Bang } from "./types";
 
-function safeQuerySelector<T extends Element>(
+// Helper functions for element visibility
+function hideElement(element: HTMLElement) {
+  element.classList.add('hidden');
+}
+
+function showElement(element: HTMLElement, display?: 'block' | 'flex' | 'inline' | 'inline-block') {
+  element.classList.remove('hidden');
+  if (display) {
+    element.style.display = display;
+  }
+}
+
+function safeQuerySelector<T extends HTMLElement>(
   parent: Document | Element,
   selector: string,
   errorMessage?: string,
@@ -35,7 +47,7 @@ export function renderSettingsUI() {
   const searchUrl = `${currentOrigin}?q=%s`;
 
   app.innerHTML = `
-    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 12px;">
+    <div class="main-container">
       <div class="content-container">
         <h1>Gulgle</h1>
         <p>Add the following URL as a custom search engine to your browser to use Gulgle's fast client-side redirects, including <a href="https://kbe.smaertness.net/">all Kagi bangs</a>, custom bangs, and a configurable default search engine.</p>
@@ -78,13 +90,13 @@ export function renderSettingsUI() {
                           <strong>!${bang.t}</strong> - ${bang.s}
                           <div class="bang-url">${bang.u}</div>
                         </div>
-                        <div class="bang-edit" id="edit-${bang.t}" style="display: none;">
+                        <div class="bang-edit bang-form hidden" id="edit-${bang.t}">
                           <label>Edit Custom Bang</label>
                           <div class="form-row">
-                            <input type="text" class="edit-trigger form-input" value="${bang.t}" placeholder="Trigger (e.g., 'gh')" />
-                            <input type="text" class="edit-name form-input" value="${bang.s}" placeholder="Name (e.g., 'GitHub')" />
+                            <input type="text" class="form-input" value="${bang.t}" placeholder="Trigger (e.g., 'gh')" />
+                            <input type="text" class="form-input" value="${bang.s}" placeholder="Name (e.g., 'GitHub')" />
                           </div>
-                          <input type="text" class="edit-url form-input full-width" value="${bang.u}" placeholder="URL (direct link or search template with %s)" />
+                          <input type="text" class="form-input--full-width" value="${bang.u}" placeholder="URL (direct link or search template with %s)" />
                           <div class="edit-buttons">
                             <button class="save-bang-btn primary-button" data-trigger="${bang.t}">Save</button>
                             <button class="cancel-edit-btn secondary-button" data-trigger="${bang.t}">Cancel</button>
@@ -93,7 +105,7 @@ export function renderSettingsUI() {
                       </div>
                       <div class="bang-actions">
                         <div class="action-display" id="actions-display-${bang.t}">
-                          <button class="edit-bang-btn" data-trigger="${bang.t}">Edit</button>
+                          <button class="edit-bang-btn secondary-button" data-trigger="${bang.t}">Edit</button>
                           <button class="delete-bang-btn" data-trigger="${bang.t}">Delete</button>
                         </div>
                       </div>
@@ -104,13 +116,13 @@ export function renderSettingsUI() {
     }
               </div>
 
-              <div class="add-bang-form">
+              <div class="bang-form">
                 <label>Add Custom Bang</label>
                 <div class="form-row">
                   <input type="text" id="bang-trigger" placeholder="Trigger (e.g., 'gh')" class="form-input" />
                   <input type="text" id="bang-name" placeholder="Name (e.g., 'GitHub')" class="form-input" />
                 </div>
-                <input type="text" id="bang-url" placeholder="URL (direct link or search template with %s)" class="form-input full-width" />
+                <input type="text" id="bang-url" placeholder="URL (direct link or search template with %s)" class="form-input--full-width" />
                 <button id="add-bang-btn" class="primary-button">Add Bang</button>
               </div>
             </div>
@@ -123,8 +135,8 @@ export function renderSettingsUI() {
                 <button id="export-settings-btn" class="secondary-button">Export Settings</button>
                 <button id="import-settings-btn" class="secondary-button">Import Settings</button>
               </div>
-              <input type="file" id="import-file-input" accept=".json" style="display: none;" />
-              <div id="import-export-status" class="status-message" style="display: none;"></div>
+              <input type="file" id="import-file-input" accept=".json" class="hidden" />
+              <div id="import-export-status" class="status-message hidden"></div>
             </div>
           </div>
         </div>
@@ -214,7 +226,7 @@ function setupEventListeners() {
     autoComplete.innerHTML = "";
 
     if (!value) {
-      autoComplete.style.display = "none";
+      hideElement(autoComplete);
       return;
     }
 
@@ -235,7 +247,7 @@ function setupEventListeners() {
       .splice(0, 10);
 
     if (!matches.length) {
-      autoComplete.style.display = "none";
+      hideElement(autoComplete);
       return;
     }
 
@@ -252,7 +264,7 @@ function setupEventListeners() {
       item.addEventListener("click", () => {
         defaultBangInput.classList.remove("error");
         defaultBangInput.value = match.t;
-        autoComplete.style.display = "none";
+        hideElement(autoComplete);
         setThroughDropDown = true;
         setDefaultBang(match);
       });
@@ -264,7 +276,7 @@ function setupEventListeners() {
         autoComplete.appendChild(hr);
       }
     });
-    autoComplete.style.display = "block";
+    showElement(autoComplete, 'block');
     // setDefaultBang((await getAllBangs()).find(b => b.t == defaultBangInput.value)!!);
   });
 
@@ -352,9 +364,9 @@ function setupEventListeners() {
       const editElement = safeQuerySelector<HTMLDivElement>(app, `#edit-${trigger}`);
       const actionsDisplay = safeQuerySelector<HTMLDivElement>(app, `#actions-display-${trigger}`);
 
-      displayElement.style.display = "none";
-      editElement.style.display = "block";
-      actionsDisplay.style.display = "none";
+      hideElement(displayElement);
+      showElement(editElement, 'block');
+      hideElement(actionsDisplay);
     });
   });
 
@@ -368,9 +380,10 @@ function setupEventListeners() {
       }
 
       const editElement = safeQuerySelector<HTMLDivElement>(app, `#edit-${trigger}`);
-      const newTrigger = (editElement.querySelector(".edit-trigger") as HTMLInputElement).value.trim().toLowerCase();
-      const newName = (editElement.querySelector(".edit-name") as HTMLInputElement).value.trim();
-      const newUrl = (editElement.querySelector(".edit-url") as HTMLInputElement).value.trim();
+      const formInputs = editElement.querySelectorAll('.form-input');
+      const newTrigger = (formInputs[0] as HTMLInputElement).value.trim().toLowerCase();
+      const newName = (formInputs[1] as HTMLInputElement).value.trim();
+      const newUrl = (editElement.querySelector(".form-input--full-width") as HTMLInputElement).value.trim();
 
       if (!newTrigger || !newName || !newUrl) {
         alert("Please fill in all fields");
@@ -419,9 +432,9 @@ function setupEventListeners() {
       const editElement = safeQuerySelector<HTMLDivElement>(app, `#edit-${trigger}`);
       const actionsDisplay = safeQuerySelector<HTMLDivElement>(app, `#actions-display-${trigger}`);
 
-      displayElement.style.display = "block";
-      editElement.style.display = "none";
-      actionsDisplay.style.display = "flex";
+      showElement(displayElement, 'block');
+      hideElement(editElement);
+      showElement(actionsDisplay, 'flex');
     });
   });
 
@@ -502,10 +515,10 @@ function showStatusMessage(message: string, type: "success" | "error") {
 
   statusElement.textContent = message;
   statusElement.className = `status-message ${type}`;
-  statusElement.style.display = "block";
+  showElement(statusElement);
 
   // Hide the message after 5 seconds
   setTimeout(() => {
-    statusElement.style.display = "none";
+    hideElement(statusElement);
   }, 5000);
 }
