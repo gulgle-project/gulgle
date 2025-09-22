@@ -26,11 +26,11 @@ function showElement(element: HTMLElement, display?: 'block' | 'flex' | 'inline'
 }
 
 function safeQuerySelector<T extends HTMLElement>(
-  parent: Document | Element,
+  parent: Document | Element | null | undefined,
   selector: string,
   errorMessage?: string,
 ): T {
-  const element = parent.querySelector<T>(selector);
+  const element = parent?.querySelector<T>(selector);
   if (!element) {
     throw new Error(errorMessage || `Element not found: ${selector}`);
   }
@@ -93,12 +93,12 @@ export function renderSettingsUI() {
                         <div class="bang-edit bang-form hidden" id="edit-${bang.t}">
                           <label>Edit Custom Bang</label>
                           <div class="form-row">
-                            <input type="text" class="form-input" value="${bang.t}" placeholder="Trigger (e.g., 'gh')" />
+                            <input id="edit-bang-trigger" type="text" class="form-input" value="${bang.t}" data-value="${bang.t}" placeholder="Trigger (e.g., 'gh')" />
                             <input type="text" class="form-input" value="${bang.s}" placeholder="Name (e.g., 'GitHub')" />
                           </div>
                           <input type="text" class="form-input--full-width" value="${bang.u}" placeholder="URL (direct link or search template with %s)" />
                           <div class="edit-buttons">
-                            <button class="save-bang-btn primary-button" data-trigger="${bang.t}">Save</button>
+                            <button class="save-bang-btn primary-button" data-trigger="${bang.t}" disabled>Save</button>
                             <button class="cancel-edit-btn secondary-button" data-trigger="${bang.t}">Cancel</button>
                           </div>
                         </div>
@@ -122,8 +122,9 @@ export function renderSettingsUI() {
                   <input type="text" id="bang-trigger" placeholder="Trigger (e.g., 'gh')" class="form-input" />
                   <input type="text" id="bang-name" placeholder="Name (e.g., 'GitHub')" class="form-input" />
                 </div>
+                </div>
                 <input type="text" id="bang-url" placeholder="URL (direct link or search template with %s)" class="form-input--full-width" />
-                <button id="add-bang-btn" class="primary-button">Add Bang</button>
+                <button id="add-bang-btn" class="primary-button" disabled>Add Bang</button>
               </div>
             </div>
           </div>
@@ -233,7 +234,7 @@ function setupEventListeners() {
     if (!setThroughDropDown) {
       defaultBangInput.classList.add("error");
     } else {
-      defaultBangInput.classList.add("error");
+      defaultBangInput.classList.remove("error");
     }
 
     const bangs = await getAllBangs();
@@ -284,17 +285,21 @@ function setupEventListeners() {
   const addBangBtn = safeQuerySelector<HTMLButtonElement>(app, "#add-bang-btn");
   const triggerInput = safeQuerySelector<HTMLInputElement>(app, "#bang-trigger");
   const nameInput = safeQuerySelector<HTMLInputElement>(app, "#bang-name");
-  const urlInput2 = safeQuerySelector<HTMLInputElement>(app, "#bang-url"); triggerInput.addEventListener("input", async () => {
+  const urlInput2 = safeQuerySelector<HTMLInputElement>(app, "#bang-url");
+
+  triggerInput.addEventListener("input", async () => {
     if (!triggerInput.value) {
       return;
     }
 
     if ((await getBangs()).find((b) => b.t === triggerInput.value)) {
       triggerInput.classList.add("error");
+      addBangBtn.disabled = true;
       return;
     }
 
     triggerInput.classList.remove("error");
+    addBangBtn.disabled = false;
   });
 
   addBangBtn.addEventListener("click", () => {
@@ -415,6 +420,24 @@ function setupEventListeners() {
 
       // Refresh the UI
       renderSettingsUI();
+    });
+  });
+
+  app.querySelectorAll<HTMLInputElement>("#edit-bang-trigger").forEach((input) => {
+    const saveBtn = safeQuerySelector<HTMLButtonElement>(input.parentElement?.parentElement, ".save-bang-btn");
+    input.addEventListener("input", async () => {
+      if (!input.value) {
+        return;
+      }
+
+      if ((await getBangs()).find((b) => b.t === input.value) || getCustomBangs().find(b => b.t === input.value && b.t !== input.dataset.value)) {
+        input.classList.add("error");
+        saveBtn.disabled = true;
+        return;
+      }
+
+      input.classList.remove("error");
+      saveBtn.disabled = false;
     });
   });
 
