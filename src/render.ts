@@ -3,7 +3,6 @@ import clipboardCheckSvg from "/clipboard-check.svg";
 import {
   addCustomBang,
   getAllBangs,
-  getBangs,
   getCustomBangs,
   getDefaultBangOrStore,
   removeCustomBang,
@@ -214,13 +213,7 @@ function setupEventListeners() {
   let setThroughDropDown = true;
   const autoComplete = safeQuerySelector<HTMLDivElement>(app, "#autocomplete-list");
   const defaultBangInput = safeQuerySelector<HTMLInputElement>(app, "#default-bang");
-  // defaultBangInput.addEventListener("blur", () => {
-  //   if (defaultBangInput.classList.contains("error")) {
-  //     defaultBangInput.value = getDefaultBangOrStore().t;
-  //     defaultBangInput.classList.remove("error");
-  //     autoComplete.style.display = "none";
-  //   }
-  // });
+
   defaultBangInput.addEventListener("input", async () => {
     setThroughDropDown = false;
 
@@ -293,7 +286,7 @@ function setupEventListeners() {
       return;
     }
 
-    if ((await getBangs()).find((b) => b.t === triggerInput.value)) {
+    if (getCustomBangs().find((b) => b.t === triggerInput.value)) {
       triggerInput.classList.add("error");
       addBangBtn.disabled = true;
       return;
@@ -431,7 +424,7 @@ function setupEventListeners() {
         return;
       }
 
-      if ((await getBangs()).find((b) => b.t === input.value) || getCustomBangs().find(b => b.t === input.value && b.t !== input.dataset.value)) {
+      if (getCustomBangs().find(b => b.t === input.value && b.t !== input.dataset.value)) {
         input.classList.add("error");
         saveBtn.disabled = true;
         return;
