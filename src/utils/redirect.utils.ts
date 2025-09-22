@@ -1,4 +1,4 @@
-import { getAllBangs, getDefaultBangOrStore } from "./bang-manager";
+import { bangManager } from "@/state/bang-manager";
 
 function replaceUrlTemplate(template: string, query: string): string {
   if (template.includes("%s")) {
@@ -10,9 +10,8 @@ function replaceUrlTemplate(template: string, query: string): string {
   return template;
 }
 
-async function getBangRedirectUrl(): Promise<string | null> {
-  const url = new URL(window.location.href);
-  const query = url.searchParams.get("q")?.trim() ?? "";
+async function getBangRedirectUrl(searchInput?: string): Promise<string | null> {
+  const query = (searchInput || new URL(window.location.href).searchParams.get("q") || "").trim();
 
   if (!query) {
     return null;
@@ -22,19 +21,16 @@ async function getBangRedirectUrl(): Promise<string | null> {
   const bangCandidate = match?.[1]?.toLowerCase();
 
   if (!bangCandidate) {
-    return replaceUrlTemplate(getDefaultBangOrStore().u, query);
+    return replaceUrlTemplate(bangManager.getDefaultBangOrStore().u, query);
   }
 
   // Check custom bangs first, then default bangs
-  const allBangs = await getAllBangs();
-  const selectedBang = allBangs.find((b) =>
-    b.t === bangCandidate ||
-    (b.ts && b.ts.includes(bangCandidate))
-  );
+  const allBangs = await bangManager.getAllBangs();
+  const selectedBang = allBangs.find((b) => b.t === bangCandidate || b.ts?.includes(bangCandidate));
 
   // If we have a bang candidate but no matching bang found, use default search with full query
   if (!selectedBang) {
-    return replaceUrlTemplate(getDefaultBangOrStore().u, query);
+    return replaceUrlTemplate(bangManager.getDefaultBangOrStore().u, query);
   }
 
   // Remove the first bang from the query
@@ -62,13 +58,18 @@ async function getBangRedirectUrl(): Promise<string | null> {
   }
 }
 
-export async function doRedirect(): Promise<boolean> {
-  const searchUrl = await getBangRedirectUrl();
+export async function doRedirect(searchInput?: string): Promise<boolean> {
+  const searchUrl = await getBangRedirectUrl(searchInput);
 
   if (!searchUrl) {
     return false;
   }
 
-  window.location.replace(searchUrl);
+  if (searchInput) {
+    window.location.href = searchUrl;
+  } else {
+    window.location.replace(searchUrl);
+  }
+
   return true;
 }
