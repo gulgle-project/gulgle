@@ -122,9 +122,10 @@ export function renderSettingsUI() {
                   <input type="text" id="bang-trigger" placeholder="Trigger (e.g., 'gh')" class="form-input" />
                   <input type="text" id="bang-name" placeholder="Name (e.g., 'GitHub')" class="form-input" />
                 </div>
-                </div>
                 <input type="text" id="bang-url" placeholder="URL (direct link or search template with %s)" class="form-input--full-width" />
-                <button id="add-bang-btn" class="primary-button" disabled>Add Bang</button>
+                <div>
+                  <button id="add-bang-btn" class="primary-button" disabled>Add Bang</button>
+                </div>
               </div>
             </div>
           </div>

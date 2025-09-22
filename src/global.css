@@ -430,7 +430,6 @@ input.error {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin-top: 10px;
 }
 
 /* Mobile form layouts */
@@ -849,11 +848,6 @@ input.error {
   }
 }
 
-/* ================================
-   LEGACY CLASS SUPPORT
-   ================================ */
-
-/* Support old class names for compatibility */
 .primary-button {
   padding: 10px var(--spacing-xl);
   background: var(--color-primary);
@@ -933,7 +927,7 @@ button:disabled {
   width: 100%;
 }
 
-/* Mobile adjustments for legacy buttons */
+/* Mobile adjustments for buttons */
 @media (max-width: 480px) {
   .primary-button,
   .secondary-button {
