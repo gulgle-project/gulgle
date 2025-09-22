@@ -23,11 +23,12 @@
   --color-primary: #007acc;
   --color-primary-hover: #005a9e;
   --color-primary-active: #004785;
+  --color-primary-disabled: #a9a9a9;
   --color-success: #28a745;
   --color-danger: #dc3545;
   --color-danger-hover: #c82333;
   --color-border: #ddd;
-  --color-border-light: #e0e0e0;
+  --color-border-light: #aeaeae;
     --color-background: #f5f5f5;
     --color-background-secondary: #fafafa;
     --color-background-tertiary: #f8f9fa;
@@ -875,6 +876,11 @@ input.error {
 .primary-button:active {
   background: var(--color-primary-active);
   border-color: var(--color-primary-active);
+}
+
+button:disabled {
+  background: var(--color-primary-disabled);
+  border-color: var(--color-primary-disabled);
 }
 
 .secondary-button {
