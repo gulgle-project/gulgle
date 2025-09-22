@@ -11,7 +11,7 @@ https://gulgle.guldner.eu?q=%s
 
 DuckDuckGo does their redirects server side. Their DNS is...not always great. Result is that it often takes ages.
 
-We solved this by doing all of the work client side. Once you've went to https://gulgle.guldner.eu/ once, the JS is all cache'd and will never need to be downloaded again. Your device does the redirects, not me.
+We solved this by doing all of the work client side. After you've went to https://gulgle.link/ once, the JS is all cached and will never need to be downloaded again. Your device does the redirects without the need for a server.
 
 ## Features
 
@@ -19,7 +19,9 @@ We solved this by doing all of the work client side. Once you've went to https:/
 - Comprehensive ~~DuckDuckGo's~~ Kagi's Bang Support: The application includes a large list of bang commands sourced from ~~DuckDuckGo's~~ Kagi's official list.
 - Custom Bangs: Users can add their own custom bang shortcuts directly within the application's settings, which are stored locally in the browser.
 - Configurable Default Search Engine: Users can choose their preferred default search engine from a list of popular options, including any custom bangs they have added.
+- Settings import & export: Users can backup their data (custom bangs, default bang) in JSON format.
 - Automated Bang List Updates: A GitHub Actions workflow is set up to automatically fetch and update the list of default bangs from ~~DuckDuckGo~~ Kagi on a monthly basis.
 
+## Acknowledgments
 
-
+This project is built upon and was initially forked from [unduck](https://github.com/T3-Content/unduck).
