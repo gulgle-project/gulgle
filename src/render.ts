@@ -1,6 +1,5 @@
 import clipboardSvg from "/clipboard.svg";
 import clipboardCheckSvg from "/clipboard-check.svg";
-import type { bangs } from "./bang";
 import {
   addCustomBang,
   getAllBangs,
@@ -10,7 +9,7 @@ import {
   removeCustomBang,
   setDefaultBang,
 } from "./bang-manager";
-import type { CustomBang } from "./types";
+import type { Bang } from "./types";
 
 function safeQuerySelector<T extends Element>(
   parent: Document | Element,
@@ -132,8 +131,17 @@ function levenshtein(a: string, b: string) {
   return prev[b.length];
 }
 
-function score(a: CustomBang | (typeof bangs)[0], value: string): number {
-  return Math.min(levenshtein(a.t, value) * 1, levenshtein(a.s, value) * 2);
+function score(a: Bang, value: string): number {
+  // Primary trigger has lowest penalty
+  const triggerScore = levenshtein(a.t, value) * 1;
+  // Description has higher penalty
+  const descriptionScore = levenshtein(a.s, value) * 2;
+  // Additional triggers have medium penalty
+  const tsScore = a.ts
+    ? Math.min(...a.ts.map((trigger: string) => levenshtein(trigger, value) * 1.5))
+    : Infinity;
+
+  return Math.min(triggerScore, descriptionScore, tsScore);
 }
 
 function setupEventListeners() {
@@ -180,7 +188,11 @@ function setupEventListeners() {
 
     const bangs = await getAllBangs();
     const matches = bangs
-      .filter((b) => b.t.toLowerCase().includes(value) || b.s.toLowerCase().includes(value))
+      .filter((b) =>
+        b.t.toLowerCase().includes(value) ||
+        b.s.toLowerCase().includes(value) ||
+        (b.ts && b.ts.some(trigger => trigger.toLowerCase().includes(value)))
+      )
       .sort((a, b) => score(a, value) - score(b, value))
       .splice(0, 10);
 
