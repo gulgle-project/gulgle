@@ -1,11 +1,10 @@
-import type { bangs } from "./bang";
-import type { CustomBang } from "./types";
+import type { CustomBang, Bang } from "./types";
 
 // Custom bangs management
 const STORAGE_KEY = "custom-bangs";
 const DEFAULT_BANG_KEY = "default-bang";
 
-const DEFAULT = {
+const DEFAULT: Bang = {
   t: "g",
   s: "Google",
   u: "https://www.google.com/search?q={{{s}}}",
@@ -39,7 +38,7 @@ export function removeCustomBang(trigger: string): void {
   saveCustomBangs(customBangs);
 }
 
-export function getDefaultBang(): CustomBang | (typeof bangs)[0] | null {
+export function getDefaultBang(): Bang | null {
   const result = localStorage.getItem(DEFAULT_BANG_KEY);
 
   if (!result) {
@@ -49,7 +48,7 @@ export function getDefaultBang(): CustomBang | (typeof bangs)[0] | null {
   return JSON.parse(result);
 }
 
-export function getDefaultBangOrStore(): CustomBang | (typeof bangs)[0] | typeof DEFAULT {
+export function getDefaultBangOrStore(): Bang {
   const defaultBang = getDefaultBang();
 
   if (defaultBang) {
@@ -60,14 +59,14 @@ export function getDefaultBangOrStore(): CustomBang | (typeof bangs)[0] | typeof
   return DEFAULT;
 }
 
-export function setDefaultBang(bang: CustomBang | (typeof bangs)[0]): void {
+export function setDefaultBang(bang: Bang): void {
   localStorage.setItem(DEFAULT_BANG_KEY, JSON.stringify(bang));
 }
 
-export async function getAllBangs(): Promise<(CustomBang | (typeof bangs)[0])[]> {
+export async function getAllBangs(): Promise<Bang[]> {
   return [...getCustomBangs(), ...(await getBangs())];
 }
 
-export async function getBangs(): Promise<typeof bangs> {
+export async function getBangs(): Promise<Bang[]> {
   return (await import("./bang")).bangs;
 }

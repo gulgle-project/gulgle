@@ -27,7 +27,10 @@ async function getBangRedirectUrl(): Promise<string | null> {
 
   // Check custom bangs first, then default bangs
   const allBangs = await getAllBangs();
-  const selectedBang = allBangs.find((b) => b.t === bangCandidate);
+  const selectedBang = allBangs.find((b) =>
+    b.t === bangCandidate ||
+    (b.ts && b.ts.includes(bangCandidate))
+  );
 
   // If we have a bang candidate but no matching bang found, use default search with full query
   if (!selectedBang) {

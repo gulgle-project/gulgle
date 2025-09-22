@@ -46,8 +46,8 @@ function fetchBangData() {
 
 /**
  * Convert Kagi bang format to our format
- * Kagi format: {"c":"Tech","d":"www.01net.com","r":0,"s":"01net","sc":"Downloads (apps)","t":"01net","u":"http://..."}
- * Our format: {t: "01net", s: "01net", u: "http://...", d: "www.01net.com"}
+ * Kagi format: {"c":"Reference","d":"en.wikipedia.org","r":0,"s":"Wikipedia","sc":"Encyclopedia","t":"w","u":"https://en.wikipedia.org/wiki/{{{s}}}","ts":["wiki","wikipedia"]}
+ * Our format: {t: "w", s: "Wikipedia", u: "https://en.wikipedia.org/wiki/{{{s}}}", d: "en.wikipedia.org", ts: ["wiki","wikipedia"]}
  */
 function convertBangFormat(bangs) {
   console.log("Converting bang format...");
@@ -57,6 +57,7 @@ function convertBangFormat(bangs) {
     s: bang.s, // name/description
     u: bang.u, // url template
     d: bang.d, // domain
+    ts: bang.ts ?? []
   }));
 }
 
@@ -74,11 +75,17 @@ function generateBangFileContent(bangs) {
       const escapedU = bang.u.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
       const escapedD = bang.d.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 
+      // Handle additional triggers if they exist
+      const tsField = bang.ts && bang.ts.length > 0
+        ? `ts: [${bang.ts.map(t => `"${t.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`).join(", ")}]`
+        : "";
+
       return `  {
     t: "${escapedT}",
     s: "${escapedS}",
     u: "${escapedU}",
-    d: "${escapedD}"
+    d: "${escapedD}",
+    ${tsField}
   }`;
     })
     .join(",\n");
