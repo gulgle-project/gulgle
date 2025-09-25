@@ -1,38 +1,75 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.2.4/schema.json",
-  "vcs": {
-    "enabled": false,
-    "clientKind": "git",
-    "useIgnoreFile": false
-  },
-  "files": {
-    "includes": ["**/public/**/*/**", "**/scripts/**/*/**", "**/src/**/*/**", "!**/node_modules", "!**/dist"],
-    "ignoreUnknown": false
-  },
-  "linter": {
-    "enabled": true,
-    "domains": {
-      "react": "recommended",
-      "project": "recommended",
-      "test": "recommended"
-    },
-    "rules": {
-      "recommended": true,
-      "style": {
-        "useSelfClosingElements": "error"
-      }
-    }
-  },
-  "formatter": {
-    "enabled": true,
-    "useEditorconfig": true,
-    "lineWidth": 120
-  },
   "assist": {
     "actions": {
       "source": {
-        "organizeImports": "on"
+        "organizeImports": "on",
+        "useSortedAttributes": "on"
       }
     }
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": [
+      "**/public/**/*/**",
+      "**/scripts/**/*/**",
+      "**/src/**/*/**",
+      "!**/node_modules",
+      "!**/dist",
+      "!**/kagi-bangs.ts",
+      "!**/src/old_to_be_deleted"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "lineWidth": 120,
+    "useEditorconfig": true
+  },
+  "linter": {
+    "domains": {
+      "project": "recommended",
+      "react": "recommended",
+      "test": "recommended"
+    },
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "noUnusedVariables": "off"
+      },
+      "style": {
+        "noCommonJs": "error",
+        "noEnum": "error",
+        "noNamespace": "error",
+        "useArrayLiterals": "error",
+        "useBlockStatements": "error",
+        "useConsistentArrayType": {
+          "level": "error",
+          "options": {
+            "syntax": "generic"
+          }
+        },
+        "useConsistentCurlyBraces": "error",
+        "useFilenamingConvention": {
+          "level": "error",
+          "options": {
+            "filenameCases": ["kebab-case"],
+            "match": "%?(.+?)[.](.+)",
+            "requireAscii": true,
+            "strictCase": true
+          }
+        },
+        "useNodejsImportProtocol": "error",
+        "useObjectSpread": "error",
+        "useSelfClosingElements": "error",
+        "useSingleVarDeclarator": "error",
+        "useUnifiedTypeSignatures": "error"
+      }
+    }
+  },
+  "vcs": {
+    "clientKind": "git",
+    "enabled": false,
+    "useIgnoreFile": false
   }
 }

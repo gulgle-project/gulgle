@@ -4,7 +4,7 @@ export type BuiltInBang = {
   s: string; // name/description
   u: string; // url template
   d: string; // domain
-  ts?: string[]; // additional triggers (optional)
+  ts?: Array<string>; // additional triggers (optional)
 };
 
 export type CustomBang = BuiltInBang & {
@@ -14,8 +14,8 @@ export type CustomBang = BuiltInBang & {
 export type Bang = BuiltInBang | CustomBang;
 
 export type ExportedSettings = {
-  customBangs: CustomBang[];
+  customBangs: Array<CustomBang>;
   defaultBang: Bang | CustomBang | undefined;
   exportedAt: string;
   version: string;
-}
+};
