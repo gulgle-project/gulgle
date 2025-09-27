@@ -24,7 +24,7 @@ export function SearchPage() {
   }
 
   return (
-    <Page>
+    <Page centered>
       <h1 className="text-6xl md:text-7xl font-light mb-16 text-gray-800 dark:text-gray-100 select-none tracking-wide">
         Gulgle
       </h1>

@@ -32,7 +32,7 @@ function AppContent() {
   }, [currentPath]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-white-100 dark:bg-neutral-900">
+    <div className="h-screen flex flex-col items-center bg-white-100 dark:bg-neutral-900 overflow-hidden">
       <Header />
       {page}
       <Footer />
