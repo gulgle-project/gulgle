@@ -1,23 +1,38 @@
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 
+// Routes derived from pages folder structure
+// Note: "/" maps to search.tsx (default page)
+// Update this array when adding new pages to src/pages/
+const ROUTES = ["/", "/search", "/settings", "/imprint"] as const;
+
+export type Route = (typeof ROUTES)[number];
+
 export type Router = {
-  currentPath: string;
-  navigate: (path: string) => void;
+  currentPath: Route;
+  navigate: (path: Route) => void;
   goBack: () => void;
-  replace: (path: string) => void;
+  replace: (path: Route) => void;
 };
 
 const RouterContext = createContext<Router | null>(null);
 
+function isValidRoute(path: string): path is Route {
+  return ROUTES.includes(path as Route);
+}
+
 export function RouterProvider({ children }: { children: ReactNode }) {
-  const [currentPath, setCurrentPath] = useState(() => {
+  const [currentPath, setCurrentPath] = useState<Route>(() => {
     if (typeof window !== "undefined") {
-      return window.location.pathname;
+      const pathname = window.location.pathname;
+      if (isValidRoute(pathname)) {
+        return pathname;
+      }
+      return "/";
     }
     return "/";
   });
 
-  function navigate(path: string) {
+  function navigate(path: Route) {
     window.history.pushState({}, "", path);
     setCurrentPath(path);
   }
@@ -26,16 +41,18 @@ export function RouterProvider({ children }: { children: ReactNode }) {
     window.history.back();
   }
 
-  function replace(path: string) {
+  function replace(path: Route) {
     window.history.replaceState({}, "", path);
     setCurrentPath(path);
   }
 
   useEffect(() => {
-    setCurrentPath(window.location.pathname);
+    const pathname = window.location.pathname;
+    setCurrentPath(isValidRoute(pathname) ? pathname : "/");
 
     const handlePopState = () => {
-      setCurrentPath(window.location.pathname);
+      const pathname = window.location.pathname;
+      setCurrentPath(isValidRoute(pathname) ? pathname : "/");
     };
 
     window.addEventListener("popstate", handlePopState);

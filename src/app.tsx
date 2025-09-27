@@ -19,16 +19,18 @@ function AppContent() {
   const { currentPath } = useRouter();
 
   const page = useMemo(() => {
-    if (currentPath === '/settings' || currentPath.endsWith('/settings')) {
-      return <SettingsPage />;
+    switch (currentPath) {
+      case '/':
+      case '/search':
+        return <SearchPage />;
+      case '/settings':
+        return <SettingsPage />;
+      case '/imprint':
+        return <ImprintPage />;
+      default:
+        const exhaustiveCheck: never = currentPath;
+        return exhaustiveCheck;
     }
-
-    if (currentPath === '/imprint' || currentPath.endsWith('/imprint')) {
-      return <ImprintPage />;
-    }
-
-    // Default to search page for root, /search, or any query parameters
-    return <SearchPage />;
   }, [currentPath]);
 
   return (
