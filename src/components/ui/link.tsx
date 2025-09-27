@@ -1,8 +1,8 @@
 import type { AnchorHTMLAttributes, MouseEvent } from "react";
-import { useRouter } from "../../contexts/router-context";
+import { type Route, useRouter } from "../../contexts/router-context";
 
 type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
-  to: string;
+  to: Route;
 };
 
 export function Link({ to, children, onClick, ...props }: LinkProps) {
