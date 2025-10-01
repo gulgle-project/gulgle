@@ -53,9 +53,10 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add src/bang.ts
+          git switch --create update-bangs
+          git add src/const/kagi-bangs.ts
           git commit -m "chore: update bang list from Kagi API [skip ci]"
-          git push
+          git push --set-upstream origin update-bangs
 
       - name: Build and deploy
         if: steps.verify-changed-files.outputs.changed == 'true'
