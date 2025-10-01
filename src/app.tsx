@@ -34,7 +34,7 @@ function AppContent() {
   }, [currentPath]);
 
   return (
-    <div className="h-screen flex flex-col items-center bg-white-100 dark:bg-neutral-900 overflow-hidden">
+    <div className="h-dvh flex flex-col items-center bg-white-100 dark:bg-neutral-900 custom-scrollbar overflow-x-hidden overflow-y-auto">
       <Header />
       {page}
       <Footer />
