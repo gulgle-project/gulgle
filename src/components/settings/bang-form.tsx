@@ -59,7 +59,7 @@ function BangForm({ bang, onClose }: { bang?: CustomBang; onClose?: () => void }
                 <Input
                   className="flex-1 text-lg border-none bg-none dark:bg-none shadow-none focus:ring-0 p-2 h-8"
                   onChange={(e) => setTrigger(e.target.value)}
-                  placeholder="!example"
+                  placeholder="example"
                   type="text"
                   value={trigger}
                 />
