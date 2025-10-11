@@ -56,7 +56,7 @@ jobs:
           git config --local user.name "GitHub Action"
           git switch --create update-bangs
           git add src/const/kagi-bangs.ts
-          git commit -m "chore: update bang list from Kagi API [skip ci]"
+          git commit -m "chore: update bang list from Kagi API"
           git push --force --set-upstream origin update-bangs
 
       - name: Create Pull Request
