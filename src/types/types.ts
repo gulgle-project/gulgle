@@ -1,13 +1,19 @@
 // Types
 export type BuiltInBang = {
-  t: string; // trigger
-  s: string; // name/description
-  u: string; // url template
-  d: string; // domain
-  ts?: Array<string>; // additional triggers (optional)
+  /** Trigger */
+  t: string;
+  /** Name/Description */
+  s: string;
+  /** URL Template */
+  u: string;
+  /** Domain */
+  d: string;
+  /** Additional Triggers (Optional) */
+  ts?: Array<string>;
 };
 
 export type CustomBang = BuiltInBang & {
+  /** Is custom bang */
   c: true;
 };
 
