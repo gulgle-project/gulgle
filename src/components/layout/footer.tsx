@@ -29,7 +29,7 @@ const entries = [
 
 export function Footer() {
   return (
-    <footer className="w-full mt-auto border-t border-border bg-background/80 backdrop-blur-sm sticky bottom-0 z-10">
+    <footer className="w-full mt-auto border-t border-border bg-background/80">
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex justify-center items-center gap-1">
           {entries.map((entry, index) => (
