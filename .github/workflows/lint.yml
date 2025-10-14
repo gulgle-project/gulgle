@@ -14,22 +14,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          version: 10.17.0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "pnpm"
+          bun-version: 1.3.0
 
       - name: Install dependencies
-        run: pnpm install
+        run: bun install
 
       - name: Run Biome CI
-        run: pnpm run biome:ci
+        run: bun run biome:ci
 
   typecheck:
     name: TypeScript Check
@@ -38,19 +32,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          version: 10.17.0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "pnpm"
+          bun-version: 1.3.0
 
       - name: Install dependencies
-        run: pnpm install
+        run: bun install
 
       - name: Run TypeScript Check
-        run: pnpm run typecheck
+        run: bun run typecheck
