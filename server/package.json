@@ -1,0 +1,30 @@
+{
+  "name": "settings-sync-service",
+  "module": "src/main.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "bun build --compile --outfile=dist/settings-sync src/main.ts",
+    "dev": "bun --watch src/main.ts",
+    "biome:check": "biome check .",
+    "biome:write": "biome check . --write",
+    "biome:ci": "biome ci ."
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.4",
+    "@types/bun": "latest",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/openid-client": "^3.7.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.20.0",
+    "openid-client": "^6.8.0",
+    "winston": "^3.17.0",
+    "zod": "^4.1.11"
+  }
+}
