@@ -20,6 +20,7 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "bson": "^6.10.4",
     "dotenv": "^17.2.2",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.20.0",
