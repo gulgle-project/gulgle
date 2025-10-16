@@ -130,7 +130,7 @@ export async function oidcLogin(
 			id = user._id;
 		}
 
-		return Response.json({ token: createToken(id.toString()) });
+		return Response.json(null, { status: 302, headers: { Location: getFrontendRedirectUrl(createToken(id.toString())) } });
 	}
 }
 
@@ -145,6 +145,11 @@ function getRedirectUrl(provider: string): string {
 	if (provider === "github") {
 		return `${getBaseUrl()}/api/auth/github/callback`;
 	}
+}
+
+function getFrontendRedirectUrl(token: string): string {
+  const baseFrontendUrl = requireEnv("BASE_FRONTEND_URL");
+  return `${baseFrontendUrl}/auth/success#token=${encodeURIComponent(token)}`
 }
 
 async function getUserEmail(
