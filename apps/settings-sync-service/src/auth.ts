@@ -157,7 +157,7 @@ async function getUserEmail(
 	token: string,
 ): Promise<string | undefined> {
 	if (provider === "github") {
-		const res: { email: string; primary: boolean }[] = await fetch(
+		const res = await fetch(
 			"https://api.github.com/user/public_emails",
 			{
 				headers: {
@@ -166,7 +166,7 @@ async function getUserEmail(
 					"X-GitHub-Api-Version": "2022-11-28",
 				},
 			},
-		).then((r) => r.json());
+		).then((r) => r.json()) as Array<{email: string; primary: boolean}>;
 
 		return res.find((v) => v.primary)?.email;
 	}
