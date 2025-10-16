@@ -32,7 +32,7 @@ export function SearchPage() {
       <form className="w-full max-w-xl mb-8" onSubmit={onSearch}>
         <div className="flex items-center h-14 border-2 border-neutral-200 dark:border-neutral-400 bg-transparent dark:bg-input/30 text-black dark:text-white px-4 focus-within:border-black dark:focus-within:border-white transition-colors duration-200 rounded-md">
           <Input
-            className="flex-1 text-lg border-none bg-none dark:bg-none shadow-none focus:ring-0 p-2 h-8"
+            className="flex-1 text-lg border-none shadow-none focus:ring-0 p-2 h-8 focus-visible:border-none focus-visible:ring-0 dark:bg-transparent"
             name="search"
             placeholder="Search..."
             type="text"
@@ -68,7 +68,7 @@ export function SearchPage() {
         </div>
         <div className="flex items-center h-14 border-2 border-neutral-200 dark:border-neutral-400 bg-transparent dark:bg-input/30 text-black dark:text-white px-4 focus-within:border-black dark:focus-within:border-white transition-colors duration-200 rounded-md">
           <Input
-            className="flex-1 text-lg border-none bg-none dark:bg-none shadow-none focus:ring-0 p-2 h-8"
+            className="flex-1 text-lg border-none shadow-none focus:ring-0 p-2 h-8 focus-visible:border-none focus-visible:ring-0 dark:bg-transparent"
             readOnly
             type="text"
             value={searchUrl}
