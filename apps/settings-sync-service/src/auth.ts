@@ -11,9 +11,17 @@ import {
 } from "./models/auth";
 import User from "./models/user";
 import { internalServerError, redirect,requireEnv,getBaseUrl } from "./utils";
+import { OAuthInvalidProviderError } from "./errors";
 
 const CODE_CHALLENGE_METHOD = "S256";
 const COOKIE_AUTH_CODE = "sso-auth-code";
+
+const {GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET} = process.env;
+
+if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
+  console.error("Please provice github oauth params.");
+  process.exit(1);
+}
 
 const githubConfig = new client.Configuration(
 	{
@@ -21,8 +29,8 @@ const githubConfig = new client.Configuration(
 		authorization_endpoint: "https://github.com/login/oauth/authorize",
 		token_endpoint: "https://github.com/login/oauth/access_token",
 	},
-	process.env.GITHUB_CLIENT_ID,
-	process.env.GITHUB_CLIENT_SECRET,
+	GITHUB_CLIENT_ID,
+	GITHUB_CLIENT_SECRET,
 );
 
 // export async function loginLocally(email: string, password: string): Promise<Response> {
@@ -132,12 +140,16 @@ export async function oidcLogin(
 
 		return Response.json(null, { status: 302, headers: { Location: getFrontendRedirectUrl(createToken(id.toString())) } });
 	}
+
+  throw new Error("OAuth error invalid stage:", stage);
 }
 
 function getConfig(provider: OIDCProvider): client.Configuration {
 	if (provider === "github") {
 		return githubConfig;
 	}
+
+  throw new OAuthInvalidProviderError(provider);
 }
 
 function getRedirectUrl(provider: string): string {
@@ -145,6 +157,8 @@ function getRedirectUrl(provider: string): string {
 	if (provider === "github") {
 		return `${getBaseUrl()}/api/auth/github/callback`;
 	}
+
+  throw new OAuthInvalidProviderError(provider);
 }
 
 function getFrontendRedirectUrl(token: string): string {
@@ -186,8 +200,8 @@ async function codeExchange(code: string, auth_code: string): Promise<Tokens> {
 	if (auth.provider === "github") {
 		const data = new URLSearchParams();
 
-		data.append("client_id", process.env.GITHUB_CLIENT_ID);
-		data.append("client_secret", process.env.GITHUB_CLIENT_SECRET);
+		data.append("client_id", GITHUB_CLIENT_ID!);
+		data.append("client_secret", GITHUB_CLIENT_SECRET!);
 		data.append("code", code);
 		data.append("code_verifier", auth.code_verifier);
 		data.append("nonce", auth.expectedNonce);
@@ -201,6 +215,8 @@ async function codeExchange(code: string, auth_code: string): Promise<Tokens> {
 
 		return tokens as Tokens;
 	}
+
+  throw new OAuthInvalidProviderError(auth.provider);
 }
 
 function createToken(userId: string): string {
