@@ -4,7 +4,7 @@ import fs from "node:fs";
 import https from "node:https";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { BuiltInBang } from "../src/types/types"
+import { BuiltInBang } from "../apps/gulgle-web/src/types/types"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

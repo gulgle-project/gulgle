@@ -1,5 +1,5 @@
 {
-  "name": "gulgle",
+  "name": "gulgle-web",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,8 +8,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
-    "update-bangs": "tsx scripts/update-bangs.ts"
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/node": "^24.5.2",

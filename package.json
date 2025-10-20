@@ -9,7 +9,8 @@
     "biome:check": "biome check .",
     "biome:write": "biome check . --write",
     "biome:ci": "biome ci .",
-    "typecheck": "bun run --filter '*' typecheck"
+    "typecheck": "bun run --filter '*' typecheck",
+    "update-bangs": "bun run ./scripts/update-bangs.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.4"
