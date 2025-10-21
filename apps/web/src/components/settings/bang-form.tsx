@@ -1,8 +1,8 @@
+import type { CustomBang } from "gulgle-shared";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useBangManager } from "@/hooks/use-bang-manager.hook";
 import { removeLeadingBangs } from "@/lib/utils";
-import type { CustomBang } from "@/types/types";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { Input } from "../ui/input";

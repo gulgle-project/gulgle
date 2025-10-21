@@ -1,4 +1,4 @@
-import type { Bang } from "@/types/types";
+import type { Bang } from "gulgle-shared";
 
 function levenshtein(a: string, b: string): number {
   const n = a.length;

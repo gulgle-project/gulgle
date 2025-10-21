@@ -13,7 +13,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.4",
-    "@types/bun": "latest",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/openid-client": "^3.7.0"
   },
