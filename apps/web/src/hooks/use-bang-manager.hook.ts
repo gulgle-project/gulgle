@@ -1,6 +1,6 @@
+import type { Bang, CustomBang, ExportedSettings } from "gulgle-shared";
 import { useCallback, useEffect, useState } from "react";
 import { type BangStateEvent, bangManager } from "@/state/bang-manager";
-import type { Bang, CustomBang, ExportedSettings } from "@/types/types";
 
 export type BangManagerHookResult = {
   // State

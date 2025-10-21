@@ -1,0 +1,10 @@
+{
+  "name": "gulgle-scripts",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "packageManager": "bun@1.3.0",
+  "dependencies": {
+    "gulgle-shared": "workspace:^"
+  }
+}

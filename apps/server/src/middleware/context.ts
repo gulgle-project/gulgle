@@ -1,25 +1,23 @@
-export interface ContextKey<_T> extends String {}
+export type ContextKey<T> = string & { readonly __type?: T };
 
 export class RequestContext {
-  constructor(
-    public request: Bun.BunRequest,
-    public additionalData: Record<string, unknown> = {},
-  ) {}
+  private additionalData = new Map<string, unknown>();
 
-  addData<T>(key: ContextKey<T>, value: T) {
-    this.additionalData[key as string] = value;
+  constructor(public request: Bun.BunRequest) {}
+
+  addData<T>(key: ContextKey<T>, value: T): void {
+    this.additionalData.set(key, value);
   }
 
   getData<T>(key: ContextKey<T>): T | undefined {
-    return this.additionalData[key as string] as T | undefined;
+    return this.additionalData.get(key) as T | undefined;
   }
 
   requireData<T>(key: ContextKey<T>): T {
-    const value = this.getData(key);
-    if (!value) {
+    if (!this.additionalData.has(key)) {
       throw new Error(`Missing required context data for key: ${key}`);
     }
-    return value;
+    return this.additionalData.get(key) as T;
   }
 
   getRequest(): Bun.BunRequest {

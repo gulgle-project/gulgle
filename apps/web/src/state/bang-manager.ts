@@ -1,6 +1,5 @@
+import { type Bang, type CustomBang, type ExportedSettings, isBang } from "gulgle-shared";
 import { DEFAULT_BANG } from "@/const/default-bang";
-import { isBang } from "@/types/type-guards";
-import type { Bang, CustomBang, ExportedSettings } from "@/types/types";
 
 // Storage keys
 const STORAGE_KEY = "custom-bangs";

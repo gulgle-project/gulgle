@@ -1,4 +1,4 @@
-import type { BuiltInBang } from "@/types/types";
+import type { BuiltInBang } from "gulgle-shared";
 
 export const DEFAULT_BANG: BuiltInBang = {
   d: "www.google.com",

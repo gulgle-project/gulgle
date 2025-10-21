@@ -1,8 +1,8 @@
+import type { Bang } from "gulgle-shared";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useBangManager } from "@/hooks/use-bang-manager.hook";
 import { cn } from "@/lib/utils";
-import type { Bang } from "@/types/types";
 import { score } from "@/utils/search.utils";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
