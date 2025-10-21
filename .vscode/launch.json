@@ -1,0 +1,13 @@
+{
+  "configurations": [
+    {
+      "name": "Launch Program",
+      "program": "${workspaceFolder}/apps/server/src/main.ts",
+      "request": "launch",
+      // "skipFiles": [
+      //   "<node_internals>/**"
+      // ],
+      "type": "bun"
+    }
+  ]
+}

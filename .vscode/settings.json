@@ -15,4 +15,7 @@
   "git.rebaseWhenSync": true,
   "npm.packageManager": "pnpm",
   "typescript.enablePromptUseWorkspaceTsdk": true,
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  }
 }
