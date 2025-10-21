@@ -4,14 +4,15 @@ import fs from "node:fs";
 import https from "node:https";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { BuiltInBang } from "../src/types/types"
+
+type BuiltInBang = {t: string, s: string, u: string, d: string, ts: Array<string>};
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // const BANG_URL = "https://duckduckgo.com/bang.js";
 const BANG_URL = "https://raw.githubusercontent.com/kagisearch/bangs/refs/heads/main/data/bangs.json";
-const BANG_FILE_PATH = path.join(__dirname, "..", "src", "const", "kagi-bangs.ts");
+const BANG_FILE_PATH = path.join(__dirname, "..", "apps", "web", "src", "const", "kagi-bangs.ts");
 
 /**
  * Fetch data from Kagi
@@ -106,7 +107,7 @@ ${bangEntries}
 /**
  * Write the updated bang file
  */
-function writeBangFile(content: string | NodeJS.ArrayBufferView<ArrayBufferLike>) {
+function writeBangFile(content: string | ArrayBufferView<ArrayBufferLike>) {
   console.log(`Writing updated bang file to ${BANG_FILE_PATH}...`);
 
   try {

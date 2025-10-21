@@ -1,4 +1,4 @@
-export interface ContextKey<_T> extends string {}
+export interface ContextKey<_T> extends String {}
 
 export class RequestContext {
   constructor(

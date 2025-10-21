@@ -5,7 +5,7 @@ import { logger } from "./logger";
 import { authenticated } from "./middleware/authenticated";
 import { requireEnv } from "./utils";
 
-function createServer(): Bun.Server {
+function createServer(): Bun.Server<unknown> {
 	logger.info("Creating server...");
 
   const hostname = requireEnv("LISTEN_HOST");
