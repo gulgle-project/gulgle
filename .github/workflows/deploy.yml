@@ -18,7 +18,7 @@ concurrency:
 
 defaults:
   run:
-    working-directory: ./apps/web
+    working-directory: apps/web
 
 jobs:
   build:
@@ -45,7 +45,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "./dist"
+          path: "apps/web/dist"
 
   deploy:
     name: Deploy
