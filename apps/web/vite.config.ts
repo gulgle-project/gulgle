@@ -9,6 +9,7 @@ export default defineConfig({
     registerType: "autoUpdate",
     injectRegister: "auto",
   }),],
+  base: "/",
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
