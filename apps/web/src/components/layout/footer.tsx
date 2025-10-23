@@ -6,7 +6,7 @@ const entries = [
     element: (
       <a
         className="text-muted-foreground hover:text-foreground transition-colors duration-200 text-sm"
-        href="https://github.com/hetzgu/gulgle"
+        href="https://github.com/gulgle-project/gulgle"
         rel="noopener noreferrer"
         target="_blank"
       >
