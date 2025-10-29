@@ -3,7 +3,7 @@ import { createContext, type ReactNode, useContext, useEffect, useState } from "
 // Routes derived from pages folder structure
 // Note: "/" maps to search.tsx (default page)
 // Update this array when adding new pages to src/pages/
-const ROUTES = ["/", "/search", "/settings", "/imprint"] as const;
+const ROUTES = ["/", "/search", "/settings", "/imprint", "/login", "/auth/success"] as const;
 
 export type Route = (typeof ROUTES)[number];
 

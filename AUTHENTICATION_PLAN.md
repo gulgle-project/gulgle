@@ -88,10 +88,10 @@ VITE_FRONTEND_URL=http://localhost:5173
 
 **Status:** ✅ Completed---
 
-### **Phase 2: Authentication UI Components** 📋 TODO
+### **Phase 2: Authentication UI Components** ✅ COMPLETED
 Priority: HIGH
 
-#### 2.1 Login Page
+#### 2.1 Login Page ✅ COMPLETED
 **File:** `apps/web/src/pages/login.tsx`
 
 **Features:**
@@ -100,9 +100,9 @@ Priority: HIGH
 - Loading state
 - Error display
 
-**Status:** Not Started
+**Status:** ✅ Completed
 
-#### 2.2 Auth Callback Handler
+#### 2.2 Auth Callback Handler ✅ COMPLETED
 **File:** `apps/web/src/pages/auth-callback.tsx`
 
 **Features:**
@@ -113,18 +113,18 @@ Priority: HIGH
 - Redirect to settings or previous page
 - Error handling for failed auth
 
-**Status:** Not Started
+**Status:** ✅ Completed
 
-#### 2.3 Update Router Context
+#### 2.3 Update Router Context ✅ COMPLETED
 **File:** `apps/web/src/contexts/router-context.tsx`
 
 **Changes:**
 - Add `/login` and `/auth/success` routes
 - Add route guards for protected pages
 
-**Status:** Not Started
+**Status:** ✅ Completed
 
-#### 2.4 Protected Route Wrapper
+#### 2.4 Protected Route Wrapper ✅ COMPLETED
 **File:** `apps/web/src/components/auth/protected-route.tsx`
 
 **Features:**
@@ -132,9 +132,9 @@ Priority: HIGH
 - Redirect to login if not authenticated
 - Show loading spinner during auth check
 
-**Status:** Not Started
+**Status:** ✅ Completed
 
-#### 2.5 User Menu Component
+#### 2.5 User Menu Component ✅ COMPLETED
 **File:** `apps/web/src/components/layout/user-menu.tsx`
 
 **Features:**
@@ -143,7 +143,7 @@ Priority: HIGH
 - Logout button
 - Integrate into Header component
 
-**Status:** Not Started
+**Status:** ✅ Completed
 
 ---
 
@@ -365,10 +365,10 @@ Add to `apps/web/package.json`:
 
 ## Progress Tracking
 
-**Overall Progress:** 14% (3/21 tasks completed)
+**Overall Progress:** 38% (8/21 tasks completed)
 
 **Phase 1:** 100% (3/3 tasks) ✅ COMPLETED
-**Phase 2:** 0% (0/5 tasks)
+**Phase 2:** 100% (5/5 tasks) ✅ COMPLETED
 **Phase 3:** 0% (0/5 tasks)
 **Phase 4:** 0% (0/4 tasks)
 **Phase 5:** 0% (0/3 tasks)
@@ -377,7 +377,7 @@ Add to `apps/web/package.json`:
 
 ## Notes & Decisions
 
-### October 29, 2025
+### October 29, 2025 - Session 1
 - ✅ Created `AuthContext` with full state management (login, logout, token handling)
 - ✅ Implemented JWT token expiration checking (client-side validation)
 - ✅ Created API client with typed endpoints and error handling
@@ -387,6 +387,24 @@ Add to `apps/web/package.json`:
 - Token validation includes 5-minute buffer before expiration
 - Custom error classes for API errors (UnauthorizedError, ConflictError)
 
+### October 29, 2025 - Session 2
+- ✅ Created Login page with GitHub OAuth button
+- ✅ Created Auth Callback page with token extraction and error handling
+- ✅ Updated router context to include `/login` and `/auth/success` routes
+- ✅ Created ProtectedRoute wrapper component with loading states
+- ✅ Created UserMenu component with popover for user info and logout
+- ✅ Integrated UserMenu into Header component
+- ✅ Updated App component to route to new pages
+
+**Phase 1 & 2 Complete!** Full authentication flow is now functional:
+1. User clicks "Sign In" → redirected to `/login`
+2. Clicks "Continue with GitHub" → backend OAuth flow
+3. Backend redirects to `/auth/success#token=xxx`
+4. Frontend extracts token, stores it, fetches user data
+5. User redirected to `/settings`
+6. User menu shows email and logout option
+
 **Next Steps:**
-- Start Phase 2: Create login page and auth callback handler
-- Update router to support new routes (/login, /auth/success)
+- Start Phase 3: Settings sync integration
+- Update backend Settings model to include customBangs and defaultBang
+- Extend bang-manager with cloud sync methods

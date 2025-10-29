@@ -3,6 +3,8 @@ import { SettingsPage } from "./pages/settings";
 import { Header } from "./components/layout/header";
 import { Footer } from "./components/layout/footer";
 import { ImprintPage } from "./pages/imprint";
+import { LoginPage } from "./pages/login";
+import { AuthCallbackPage } from "./pages/auth-callback";
 import { Toaster } from "./components/ui/sonner";
 import { useMemo } from "react";
 import { RouterProvider, useRouter } from "./contexts/router-context";
@@ -30,6 +32,10 @@ function AppContent() {
         return <SettingsPage />;
       case '/imprint':
         return <ImprintPage />;
+      case '/login':
+        return <LoginPage />;
+      case '/auth/success':
+        return <AuthCallbackPage />;
       default:
         const exhaustiveCheck: never = currentPath;
         return exhaustiveCheck;
