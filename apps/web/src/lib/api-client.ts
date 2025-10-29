@@ -1,5 +1,5 @@
 // API Client for authenticated requests
-import type { Bang, CustomBang } from "gulgle-shared";
+import type { SettingsDTO } from "gulgle-shared";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
@@ -9,12 +9,7 @@ export type User = {
   email: string;
 };
 
-export type SettingsData = {
-  userId: string;
-  customBangs: Array<CustomBang>;
-  defaultBang: Bang | undefined;
-  lastModified: Date;
-};
+export type { SettingsDTO };
 
 export class ApiError extends Error {
   constructor(
@@ -102,8 +97,8 @@ export async function getCurrentUser(): Promise<User> {
 /**
  * Pull settings from server
  */
-export async function pullSettings(): Promise<SettingsData> {
-  return authenticatedFetch<SettingsData>("/api/settings/v1.0", {
+export async function pullSettings(): Promise<SettingsDTO> {
+  return authenticatedFetch<SettingsDTO>("/api/settings/v1.0", {
     method: "GET",
   });
 }
@@ -111,8 +106,8 @@ export async function pullSettings(): Promise<SettingsData> {
 /**
  * Push settings to server
  */
-export async function pushSettings(settings: SettingsData): Promise<SettingsData> {
-  return authenticatedFetch<SettingsData>("/api/settings/v1.0", {
+export async function pushSettings(settings: SettingsDTO): Promise<SettingsDTO> {
+  return authenticatedFetch<SettingsDTO>("/api/settings/v1.0", {
     method: "PUT",
     body: JSON.stringify(settings),
   });

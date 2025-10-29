@@ -1,15 +1,21 @@
-import { type Bang, type CustomBang, type ExportedSettings, isBang } from "gulgle-shared";
+import { type Bang, type CustomBang, type ExportedSettings, isBang, type SettingsDTO } from "gulgle-shared";
 import { DEFAULT_BANG } from "@/const/default-bang";
+import { apiClient, ConflictError, UnauthorizedError } from "@/lib/api-client";
 
 // Storage keys
 const STORAGE_KEY = "custom-bangs";
 const DEFAULT_BANG_KEY = "default-bang";
+const LAST_SYNC_KEY = "last-sync";
 
 // Event types for state changes
 export type BangStateEvent =
   | { type: "CUSTOM_BANGS_CHANGED"; payload: Array<CustomBang> }
   | { type: "DEFAULT_BANG_CHANGED"; payload: Bang | undefined }
-  | { type: "SETTINGS_IMPORTED"; payload: ExportedSettings };
+  | { type: "SETTINGS_IMPORTED"; payload: ExportedSettings }
+  | { type: "SYNC_STARTED" }
+  | { type: "SYNC_SUCCESS"; payload: { timestamp: Date } }
+  | { type: "SYNC_ERROR"; payload: { error: string } }
+  | { type: "SYNC_CONFLICT"; payload: { serverSettings: SettingsDTO } };
 
 // Type for event listeners
 type BangStateListener = (event: BangStateEvent) => void;
@@ -264,6 +270,170 @@ class BangManagerState {
       customBangs: this.getCustomBangs(),
       defaultBang: this.getDefaultBang(),
     };
+  }
+
+  // Cloud Sync Methods
+
+  /**
+   * Get last sync timestamp
+   */
+  getLastSyncTime(): Date | null {
+    const stored = this.storage.getItem(LAST_SYNC_KEY);
+    return stored ? new Date(stored) : null;
+  }
+
+  private setLastSyncTime(date: Date): void {
+    this.storage.setItem(LAST_SYNC_KEY, date.toISOString());
+  }
+
+  /**
+   * Push local settings to cloud
+   */
+  async syncToCloud(userId: string): Promise<void> {
+    try {
+      this.emit({ type: "SYNC_STARTED" });
+
+      const settings: SettingsDTO = {
+        userId,
+        customBangs: this.getCustomBangs(),
+        defaultBang: this.getDefaultBang(),
+        lastModified: new Date(),
+      };
+
+      const result = await apiClient.pushSettings(settings);
+
+      this.setLastSyncTime(new Date(result.lastModified));
+      this.emit({ type: "SYNC_SUCCESS", payload: { timestamp: new Date() } });
+    } catch (error) {
+      if (error instanceof ConflictError) {
+        // Server has newer data - need to resolve conflict
+        const serverSettings = await apiClient.pullSettings();
+        this.emit({ type: "SYNC_CONFLICT", payload: { serverSettings } });
+        throw error;
+      }
+
+      if (error instanceof UnauthorizedError) {
+        this.emit({ type: "SYNC_ERROR", payload: { error: "Authentication required" } });
+        throw error;
+      }
+
+      const errorMessage = error instanceof Error ? error.message : "Sync failed";
+      this.emit({ type: "SYNC_ERROR", payload: { error: errorMessage } });
+      throw error;
+    }
+  }
+
+  /**
+   * Pull settings from cloud and merge with local
+   */
+  async syncFromCloud(): Promise<void> {
+    try {
+      this.emit({ type: "SYNC_STARTED" });
+
+      const serverSettings = await apiClient.pullSettings();
+
+      // Update local settings with server data
+      this.saveCustomBangs(serverSettings.customBangs);
+      if (serverSettings.defaultBang) {
+        this.setDefaultBang(serverSettings.defaultBang);
+      } else {
+        this.clearDefaultBang();
+      }
+
+      this.setLastSyncTime(new Date(serverSettings.lastModified));
+      this.emit({ type: "SYNC_SUCCESS", payload: { timestamp: new Date() } });
+    } catch (error) {
+      if (error instanceof UnauthorizedError) {
+        this.emit({ type: "SYNC_ERROR", payload: { error: "Authentication required" } });
+        throw error;
+      }
+
+      const errorMessage = error instanceof Error ? error.message : "Sync failed";
+      this.emit({ type: "SYNC_ERROR", payload: { error: errorMessage } });
+      throw error;
+    }
+  }
+
+  /**
+   * Resolve conflict by choosing local or server settings
+   */
+  async resolveConflict(choice: "local" | "server", serverSettings?: SettingsDTO, userId?: string): Promise<void> {
+    if (choice === "server" && serverSettings) {
+      // Use server settings
+      this.saveCustomBangs(serverSettings.customBangs);
+      if (serverSettings.defaultBang) {
+        this.setDefaultBang(serverSettings.defaultBang);
+      } else {
+        this.clearDefaultBang();
+      }
+      this.setLastSyncTime(new Date(serverSettings.lastModified));
+      this.emit({ type: "SYNC_SUCCESS", payload: { timestamp: new Date() } });
+    } else if (choice === "local" && userId) {
+      // Force push local settings
+      const settings: SettingsDTO = {
+        userId,
+        customBangs: this.getCustomBangs(),
+        defaultBang: this.getDefaultBang(),
+        lastModified: new Date(),
+      };
+
+      // This will overwrite server settings
+      const result = await apiClient.pushSettings(settings);
+      this.setLastSyncTime(new Date(result.lastModified));
+      this.emit({ type: "SYNC_SUCCESS", payload: { timestamp: new Date() } });
+    }
+  }
+
+  /**
+   * Bi-directional sync: pull from server, then push local changes
+   */
+  async fullSync(userId: string): Promise<void> {
+    try {
+      this.emit({ type: "SYNC_STARTED" });
+
+      // First, pull from server
+      const serverSettings = await apiClient.pullSettings();
+      const localLastModified = this.getLastSyncTime();
+
+      // If server is newer, use server settings
+      if (!localLastModified || new Date(serverSettings.lastModified) > localLastModified) {
+        this.saveCustomBangs(serverSettings.customBangs);
+        if (serverSettings.defaultBang) {
+          this.setDefaultBang(serverSettings.defaultBang);
+        } else {
+          this.clearDefaultBang();
+        }
+        this.setLastSyncTime(new Date(serverSettings.lastModified));
+      } else {
+        // Local is newer or same, push to server
+        const settings: SettingsDTO = {
+          userId,
+          customBangs: this.getCustomBangs(),
+          defaultBang: this.getDefaultBang(),
+          lastModified: new Date(),
+        };
+
+        const result = await apiClient.pushSettings(settings);
+        this.setLastSyncTime(new Date(result.lastModified));
+      }
+
+      this.emit({ type: "SYNC_SUCCESS", payload: { timestamp: new Date() } });
+    } catch (error) {
+      if (error instanceof ConflictError) {
+        const serverSettings = await apiClient.pullSettings();
+        this.emit({ type: "SYNC_CONFLICT", payload: { serverSettings } });
+        throw error;
+      }
+
+      if (error instanceof UnauthorizedError) {
+        this.emit({ type: "SYNC_ERROR", payload: { error: "Authentication required" } });
+        throw error;
+      }
+
+      const errorMessage = error instanceof Error ? error.message : "Sync failed";
+      this.emit({ type: "SYNC_ERROR", payload: { error: errorMessage } });
+      throw error;
+    }
   }
 }
 

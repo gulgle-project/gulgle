@@ -25,3 +25,11 @@ export type ExportedSettings = {
   exportedAt: string;
   version: string;
 };
+
+// Settings DTO for server sync
+export type SettingsDTO = {
+  userId: string;
+  customBangs: Array<CustomBang>;
+  defaultBang: Bang | undefined;
+  lastModified: Date;
+};
