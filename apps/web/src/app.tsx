@@ -6,12 +6,15 @@ import { ImprintPage } from "./pages/imprint";
 import { Toaster } from "./components/ui/sonner";
 import { useMemo } from "react";
 import { RouterProvider, useRouter } from "./contexts/router-context";
+import { AuthProvider } from "./contexts/auth-context";
 
 export function App() {
   return (
-    <RouterProvider>
-      <AppContent />
-    </RouterProvider>
+    <AuthProvider>
+      <RouterProvider>
+        <AppContent />
+      </RouterProvider>
+    </AuthProvider>
   );
 }
 
