@@ -67,7 +67,7 @@ export async function oidcLogin(
 
 		const parameters: Record<string, string> = {
 			redirect_uri: getRedirectUrl(provider),
-			scope: "openid email",
+			scope: "user:email",
 			code_challenge,
 			code_challenge_method: CODE_CHALLENGE_METHOD,
 		};
@@ -77,68 +77,102 @@ export async function oidcLogin(
 			parameters.nonce = nonce;
 		}
 
-		const cookies = req.cookies;
-
 		const auth = AuthEntitySchema.parse({
 			provider,
 			code_verifier,
 			expectedNonce: nonce,
 		});
 
-		executeQuery("auth", (col) => col.insertOne(auth));
+		await executeQuery("auth", (col) => col.insertOne(auth));
 
-		cookies.set(COOKIE_AUTH_CODE, auth.auth_code.toString());
+		const authUrl = client.buildAuthorizationUrl(getConfig(provider), parameters).toString();
 
-		return redirect(
-			client.buildAuthorizationUrl(getConfig(provider), parameters).toString(),
-		);
+		// Set cookie and redirect
+		const response = new Response(null, {
+			status: 302,
+			headers: {
+				Location: authUrl,
+				"Set-Cookie": `${COOKIE_AUTH_CODE}=${auth.auth_code.toString()}; HttpOnly; Path=/; SameSite=Lax`,
+			},
+		});
+
+		return response;
 	}
 
 	if (stage === "response") {
-		const cookies = req.cookies;
-		const auth_code = cookies.get(COOKIE_AUTH_CODE);
+		const cookieHeader = req.headers.get("Cookie");
+		const cookies = cookieHeader
+			? Object.fromEntries(
+					cookieHeader.split("; ").map((c) => {
+						const [key, ...v] = c.split("=");
+						return [key, v.join("=")];
+					}),
+				)
+			: {};
+
+		const auth_code = cookies[COOKIE_AUTH_CODE];
 
 		if (!auth_code) {
-			return new Response(null, { status: 500 });
+			logger.error("Missing auth code cookie");
+			return new Response("Missing auth code cookie", { status: 500 });
 		}
-
-		cookies.delete(COOKIE_AUTH_CODE);
 
 		const code = new URL(req.url).searchParams.get("code");
 		if (!code) {
+			logger.error("Missing OAuth code parameter");
 			return internalServerError();
 		}
 
+		logger.info("Exchanging code for tokens...");
 		const tokens = await codeExchange(code, auth_code);
 
 		const accessToken: string | undefined = tokens.access_token;
 		const refreshToken: string | undefined = tokens.refresh_token;
 
 		if (!accessToken) {
+			logger.error("No access token received from OAuth provider");
 			return internalServerError();
 		}
 
+		logger.info("Getting user email...");
 		const userEmail = await getUserEmail(provider, accessToken);
 
 		if (!userEmail) {
+			logger.error("Could not retrieve user email");
 			return internalServerError();
 		}
+
+		logger.info(`User email: ${userEmail}`);
 
 		const user = await executeQuery("user", (col) =>
 			col.findOne({ email: userEmail }),
 		);
 		let id: ObjectId;
 		if (!user) {
+			logger.info("Creating new user...");
 			id = (
 				await executeQuery("user", (col) =>
 					col.insertOne(new User(userEmail, undefined)),
 				)
 			).insertedId;
 		} else {
+			logger.info("User found, using existing ID");
 			id = user._id;
 		}
 
-		return Response.json(null, { status: 302, headers: { Location: getFrontendRedirectUrl(createToken(id.toString())) } });
+		const token = createToken(id.toString());
+		const redirectUrl = getFrontendRedirectUrl(token);
+
+		logger.info(`Redirecting to frontend: ${redirectUrl}`);
+
+		// Delete the auth cookie and redirect
+		return new Response(null, {
+			status: 302,
+			headers: {
+				Location: redirectUrl,
+				"Set-Cookie": `${COOKIE_AUTH_CODE}=; HttpOnly; Path=/; Max-Age=0`,
+			},
+		});
 	}
 
   throw new Error("OAuth error invalid stage:", stage);
@@ -171,18 +205,42 @@ async function getUserEmail(
 	token: string,
 ): Promise<string | undefined> {
 	if (provider === "github") {
-		const res = await fetch(
-			"https://api.github.com/user/public_emails",
-			{
+		try {
+			// First try to get email from /user/emails endpoint
+			const emails = await fetch("https://api.github.com/user/emails", {
 				headers: {
 					Authorization: `Bearer ${token}`,
 					Accept: "application/vnd.github+json",
 					"X-GitHub-Api-Version": "2022-11-28",
 				},
-			},
-		).then((r) => r.json()) as Array<{email: string; primary: boolean}>;
+			}).then((r) => r.json()) as Array<{ email: string; primary: boolean; verified: boolean }>;
 
-		return res.find((v) => v.primary)?.email;
+			// Find primary verified email
+			const primaryEmail = emails.find((e) => e.primary && e.verified);
+			if (primaryEmail) {
+				return primaryEmail.email;
+			}
+
+			// Fallback: get any verified email
+			const verifiedEmail = emails.find((e) => e.verified);
+			if (verifiedEmail) {
+				return verifiedEmail.email;
+			}
+
+			// Last resort: try to get email from user object
+			const user = await fetch("https://api.github.com/user", {
+				headers: {
+					Authorization: `Bearer ${token}`,
+					Accept: "application/vnd.github+json",
+					"X-GitHub-Api-Version": "2022-11-28",
+				},
+			}).then((r) => r.json()) as { email?: string };
+
+			return user.email;
+		} catch (error) {
+			logger.error("Error fetching GitHub user email:", error);
+			return undefined;
+		}
 	}
 }
 
