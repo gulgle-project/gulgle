@@ -3,7 +3,7 @@ FROM oven/bun:1.2.22-alpine AS builder
 COPY . /build
 WORKDIR /build
 
-RUN [ TARGETARCH = "amd64" ] && export TARGET_ARCH="x64" || export TARGET_ARCH="aarch64"; \
+RUN [ "$(uname -m)" = "x86_64" ] && export TARGET_ARCH="x64" || export TARGET_ARCH="$(uname -m)"; \
   bun install &&\
   bun build src/main.ts --target=bun-linux-${TARGET_ARCH}-musl --compile --outfile=dist/settings-sync &&\
   ls -la dist
