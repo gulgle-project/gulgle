@@ -1,5 +1,6 @@
 import { Link } from "../ui/link";
 import { ThemeToggle } from "./theme-toggle";
+import { UserMenu } from "./user-menu";
 
 export function Header() {
   return (
@@ -8,7 +9,10 @@ export function Header() {
         <Link to="/">Home</Link>
         <Link to="/settings">Settings</Link>
       </div>
-      <ThemeToggle />
+      <div className="flex gap-2 items-center">
+        <UserMenu />
+        <ThemeToggle />
+      </div>
     </div>
   );
 }
