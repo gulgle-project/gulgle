@@ -8,21 +8,67 @@ import { requireEnv } from "./utils";
 function createServer(): Bun.Server<unknown> {
 	logger.info("Creating server...");
 
-  const hostname = requireEnv("LISTEN_HOST");
-  const port = requireEnv("LISTEN_PORT");
+	const hostname = requireEnv("LISTEN_HOST");
+	const port = requireEnv("LISTEN_PORT");
 
 	const server = Bun.serve({
 		hostname,
 		port,
-		routes: {
-			// "/api/login": loginUsernamePassword,
-			"/api/auth/github": loginGithub,
-			"/api/auth/github/callback": githubResponse,
-			"/api/user/v1.0/current": authenticated(getCurrentUser),
-			"/api/settings/v1.0": {
-				PUT: authenticated(pushSettings),
-				GET: authenticated(pullSettings),
-			},
+		async fetch(req) {
+			const url = new URL(req.url);
+			logger.info(`${req.method} ${url.pathname}`);
+
+			// CORS headers
+			const origin = req.headers.get("Origin") || "*";
+			const corsHeaders = {
+				"Access-Control-Allow-Origin": origin,
+				"Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+				"Access-Control-Allow-Headers": "Content-Type, Authorization",
+				"Access-Control-Allow-Credentials": "true",
+			};
+
+			// Handle preflight requests
+			if (req.method === "OPTIONS") {
+				return new Response(null, { status: 204, headers: corsHeaders });
+			}
+
+			try {
+				let response: Response;
+
+				// Auth routes
+				if (url.pathname === "/api/auth/github" && req.method === "GET") {
+					response = await loginGithub(req as any);
+				} else if (url.pathname === "/api/auth/github/callback" && req.method === "GET") {
+					response = await githubResponse(req as any);
+				} else if (url.pathname === "/api/user/v1.0/current" && req.method === "GET") {
+					// User routes
+					response = await authenticated(getCurrentUser)(req as any);
+				} else if (url.pathname === "/api/settings/v1.0") {
+					// Settings routes
+					if (req.method === "GET") {
+						response = await authenticated(pullSettings)(req as any);
+					} else if (req.method === "PUT") {
+						response = await authenticated(pushSettings)(req as any);
+					} else {
+						response = new Response("Not Found", { status: 404 });
+					}
+				} else {
+					response = new Response("Not Found", { status: 404 });
+				}
+
+				// Add CORS headers to response
+				Object.entries(corsHeaders).forEach(([key, value]) => {
+					response.headers.set(key, value);
+				});
+
+				return response;
+			} catch (error) {
+				logger.error("Request error:", error);
+				return new Response("Internal Server Error", {
+					status: 500,
+					headers: corsHeaders,
+				});
+			}
 		},
 	});
 

@@ -3,6 +3,7 @@ import { AddBangForm } from "@/components/settings/bang-form";
 import { CustomBangsList } from "@/components/settings/custom-bangs-list";
 import { DefaultBangSelection } from "@/components/settings/default-bang-selection";
 import { ImportExportSettings } from "@/components/settings/import-export-settings";
+import { SyncSettings } from "@/components/settings/sync-settings";
 import { Card } from "@/components/ui/card";
 
 export function SettingsPage() {
@@ -14,6 +15,7 @@ export function SettingsPage() {
 
       <div className="flex-1 w-full relative">
         <div className="space-y-8 max-w-4xl mx-auto mb-6">
+          <SyncSettings />
           <DefaultBangSelection />
           <Card className="p-6">
             <div>
