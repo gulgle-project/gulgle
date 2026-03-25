@@ -6,8 +6,8 @@ const USER_STORAGE_KEY = "auth-user";
 
 // Types
 export type User = {
-  id: string;
-  email: string;
+  email?: string | null;
+  displayName: string;
 };
 
 export type AuthState = {

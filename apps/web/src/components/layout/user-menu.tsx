@@ -30,14 +30,14 @@ export function UserMenu() {
       <PopoverTrigger asChild>
         <Button className="gap-2" size="sm" variant="outline">
           <UserIcon className="h-4 w-4" />
-          <span className="hidden sm:inline">{user.email}</span>
+          <span className="hidden sm:inline">{user.displayName}{user.email ? ` (${user.email})` : ""}</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-64">
         <div className="space-y-4">
           <div className="space-y-1">
             <p className="text-sm font-medium">Signed in as</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{user.email}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{user.displayName}{user.email ? ` (${user.email})` : ""}</p>
           </div>
           <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
             <Button className="w-full gap-2" onClick={handleLogout} size="sm" variant="outline">

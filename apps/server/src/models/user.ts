@@ -1,9 +1,12 @@
 import type { ObjectId } from "bson";
+import type { OIDCProvider } from "./auth";
 
 export default class User {
   constructor(
-    public email: string,
-    public password?: string,
+    public provider: OIDCProvider,
+    public externalId: string,
+    public displayName?: string,
+    public email?: string,
     public _id?: ObjectId,
   ) {}
 }

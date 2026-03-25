@@ -18,6 +18,12 @@ const COOKIE_AUTH_CODE = "sso-auth-code";
 
 const {GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET} = process.env;
 
+type OAuthUser = {
+  externalId: string;
+  displayName?: string;
+  email?: string;
+};
+
 if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
   console.error("Please provice github oauth params.");
   process.exit(1);
@@ -32,21 +38,6 @@ const githubConfig = new client.Configuration(
 	GITHUB_CLIENT_ID,
 	GITHUB_CLIENT_SECRET,
 );
-
-// export async function loginLocally(email: string, password: string): Promise<Response> {
-//   const user = await executeQuery("user", col => col.findOne<User>({ email: email }))
-
-//   if (!user || !user.password) {
-//     return Promise.reject("Incorrect username or password");
-//   }
-
-//   try {
-//     await argon2.verify(user.password, password);
-//     return Response.json({ token: createToken(user._id) });
-//   } catch {
-//     return Promise.reject("Incorrect username or password");
-//   }
-// }
 
 export type Tokens = {
 	access_token: string;
@@ -67,7 +58,6 @@ export async function oidcLogin(
 
 		const parameters: Record<string, string> = {
 			redirect_uri: getRedirectUrl(provider),
-			scope: "user:email",
 			code_challenge,
 			code_challenge_method: CODE_CHALLENGE_METHOD,
 		};
@@ -76,6 +66,12 @@ export async function oidcLogin(
 			nonce = client.randomNonce();
 			parameters.nonce = nonce;
 		}
+
+    switch (provider) {
+      case "github":
+        parameters.scope = "user";
+        break;
+    }
 
 		const auth = AuthEntitySchema.parse({
 			provider,
@@ -134,36 +130,41 @@ export async function oidcLogin(
 			return internalServerError();
 		}
 
-		logger.info("Getting user email...");
-		const userEmail = await getUserEmail(provider, accessToken);
+		logger.info("Getting user external id...");
+		const externalUser = await getExternalId(provider, accessToken);
 
-		if (!userEmail) {
-			logger.error("Could not retrieve user email");
+		if (!externalUser) {
+			logger.error("Could not retrieve user external id");
 			return internalServerError();
 		}
 
-		logger.info(`User email: ${userEmail}`);
-
 		const user = await executeQuery("user", (col) =>
-			col.findOne({ email: userEmail }),
+			col.findOne<User>({ provider, externalId: externalUser.externalId }),
 		);
+
 		let id: ObjectId;
 		if (!user) {
 			logger.info("Creating new user...");
 			id = (
 				await executeQuery("user", (col) =>
-					col.insertOne(new User(userEmail, undefined)),
+					col.insertOne(new User(provider, externalUser.externalId, externalUser.displayName, externalUser.email)),
 				)
 			).insertedId;
 		} else {
 			logger.info("User found, using existing ID");
-			id = user._id;
+			id = user._id!;
+
+      // Update if out of date
+      user.displayName = externalUser.displayName;
+      user.email = externalUser.email;
+
+      await executeQuery("user", (col) => col.updateOne({ _id: id }, { "$set": { displayName: user.displayName , email: user.email } }))
 		}
 
 		const token = createToken(id.toString());
 		const redirectUrl = getFrontendRedirectUrl(token);
 
-		logger.info(`Redirecting to frontend: ${redirectUrl}`);
+		logger.debug(`Redirecting to frontend: ${redirectUrl}`);
 
 		// Delete the auth cookie and redirect
 		return new Response(null, {
@@ -200,52 +201,33 @@ function getFrontendRedirectUrl(token: string): string {
   return `${baseFrontendUrl}/auth/success#token=${encodeURIComponent(token)}`
 }
 
-async function getUserEmail(
+async function getExternalId(
 	provider: string,
 	token: string,
-): Promise<string | undefined> {
+): Promise<OAuthUser | undefined> {
 	if (provider === "github") {
 		try {
-			// First try to get email from /user/emails endpoint
-			const emails = await fetch("https://api.github.com/user/emails", {
-				headers: {
-					Authorization: `Bearer ${token}`,
-					Accept: "application/vnd.github+json",
-					"X-GitHub-Api-Version": "2022-11-28",
-				},
-			}).then((r) => r.json()) as Array<{ email: string; primary: boolean; verified: boolean }>;
-
-			// Find primary verified email
-			const primaryEmail = emails.find((e) => e.primary && e.verified);
-			if (primaryEmail) {
-				return primaryEmail.email;
-			}
-
-			// Fallback: get any verified email
-			const verifiedEmail = emails.find((e) => e.verified);
-			if (verifiedEmail) {
-				return verifiedEmail.email;
-			}
-
-			// Last resort: try to get email from user object
 			const user = await fetch("https://api.github.com/user", {
 				headers: {
 					Authorization: `Bearer ${token}`,
 					Accept: "application/vnd.github+json",
-					"X-GitHub-Api-Version": "2022-11-28",
+					"X-GitHub-Api-Version": "2026-03-10",
 				},
-			}).then((r) => r.json()) as { email?: string };
+			}).then((r) => r.json()) as any;
 
-			return user.email;
+			return {
+        externalId: user.id,
+        displayName: !user.name ? undefined : user.name,
+        email: !user.email ? undefined : user.email
+      };
 		} catch (error) {
-			logger.error("Error fetching GitHub user email:", error);
+			logger.error("Error fetching GitHub user external id:", error);
 			return undefined;
 		}
 	}
 }
 
 async function codeExchange(code: string, auth_code: string): Promise<Tokens> {
-	console.log(code, auth_code);
 	const auth = await executeQuery("auth", (col) =>
 		col.findOne<AuthEntity>({ auth_code }),
 	);
