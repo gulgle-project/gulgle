@@ -1,12 +1,6 @@
 import { oidcLogin } from "../auth";
 import { logger } from "../logger";
 
-// export async function loginUsernamePassword(req: Bun.BunRequest<any>): Promise<Response> {
-//   const loginDto = await LoginSchema.parseAsync(req.body);
-//   const user = await loginLocally(loginDto.email, loginDto.password);
-//   return Response.json({ token: "token" } as LoginResponseDTO)
-// }
-
 export async function loginGithub(req: Bun.BunRequest<string>): Promise<Response> {
   try {
     return await oidcLogin("github", "redirect", req);
