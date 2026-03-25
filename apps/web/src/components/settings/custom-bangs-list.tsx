@@ -4,9 +4,12 @@ import { toast } from "sonner";
 import { useBangManager } from "@/hooks/use-bang-manager.hook";
 import { Button } from "../ui/button";
 import { EditBangInlineForm } from "./bang-form";
+import { useSettingsSync } from "@/hooks/use-settings-sync.hook";
 
 export function CustomBangsList() {
   const { customBangs, removeCustomBang } = useBangManager();
+  const { fullSync } = useSettingsSync();
+
   const [editingBang, setEditingBang] = useState<string | null>(null);
 
   if (customBangs.length === 0) {
@@ -20,6 +23,7 @@ export function CustomBangsList() {
       if (editingBang === bang.t) {
         setEditingBang(null);
       }
+      fullSync(); // async
     }
   }
 

@@ -7,6 +7,7 @@ import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import { useSettingsSync } from "@/hooks/use-settings-sync.hook";
 
 function BangForm({ bang, onClose }: { bang?: CustomBang; onClose?: () => void }) {
   const [trigger, setTrigger] = useState<string>(bang?.t || "");
@@ -14,6 +15,7 @@ function BangForm({ bang, onClose }: { bang?: CustomBang; onClose?: () => void }
   const [url, setUrl] = useState<string>(bang?.u || "");
 
   const { addCustomBang, updateCustomBang } = useBangManager();
+  const { fullSync } = useSettingsSync();
 
   function onSubmitForm(e: React.FormEvent) {
     e.preventDefault();
@@ -40,6 +42,8 @@ function BangForm({ bang, onClose }: { bang?: CustomBang; onClose?: () => void }
     setName("");
     setUrl("");
     toast.success(`Bang ${bang ? "updated" : "created"} successfully.`);
+
+    fullSync(); // async
 
     onClose?.();
   }

@@ -9,13 +9,15 @@ import { Card } from "../ui/card";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../ui/command";
 import { Label } from "../ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { useSettingsSync } from "@/hooks/use-settings-sync.hook";
 
 export function DefaultBangSelection() {
   const { defaultBang, customBangs, setDefaultBang, getAllBangs } = useBangManager();
+  const { fullSync } = useSettingsSync();
 
   const [bangs, setBangs] = useState<Array<Bang>>([]);
   const [open, setOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState("");-
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: workaround because of non-react state
   useEffect(() => {
@@ -85,6 +87,7 @@ export function DefaultBangSelection() {
                       onSelect={() => {
                         setDefaultBang(bang);
                         setOpen(false);
+                        fullSync(); // async
                       }}
                       value={`!${bang.t} ${bang.s} ${bang.ts?.join(" ") || ""}`}
                     >
