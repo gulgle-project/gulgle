@@ -13,7 +13,7 @@ export function Link({ to, children, onClick, ...props }: LinkProps) {
   };
 
   return (
-    <a href={to} onClick={handleClick} {...props}>
+    <a href={`#${to}`} onClick={handleClick} {...props}>
       {children}
     </a>
   );
