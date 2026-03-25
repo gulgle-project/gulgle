@@ -2,7 +2,7 @@ import mongoDB from "mongodb";
 import { Lock, requireEnv } from "../utils";
 
 export async function getDb(): Promise<mongoDB.Db> {
-  return (await getConnection()).db("settings-sync");
+  return (await getConnection()).db();
 }
 
 export async function executeQuery<T>(collection: string, query: (db: mongoDB.Collection) => Promise<T>): Promise<T> {
