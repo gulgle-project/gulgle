@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useBangManager } from "@/hooks/use-bang-manager.hook";
+import { useSettingsSync } from "@/hooks/use-settings-sync.hook";
 import { removeLeadingBangs } from "@/utils/bang.utils";
 
 function CustomBangForm({
@@ -25,6 +26,7 @@ function CustomBangForm({
   const fieldIdPrefix = bang ? `edit-bang-${bang.t}` : "add-bang";
 
   const { addCustomBang, updateCustomBang } = useBangManager();
+  const { isAuthenticated, syncToCloud } = useSettingsSync();
 
   function onSubmitForm(e: React.FormEvent) {
     e.preventDefault();
@@ -51,6 +53,10 @@ function CustomBangForm({
     setName("");
     setUrl("");
     toast.success(`Bang ${bang ? "updated" : "created"} successfully.`);
+
+    if (isAuthenticated) {
+      syncToCloud().catch((error) => console.error("Failed to sync custom bang:", error));
+    }
 
     onClose?.();
   }
