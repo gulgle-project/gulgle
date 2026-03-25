@@ -15,6 +15,8 @@ RUN [ "$(uname -m)" = "x86_64" ] && export TARGET_ARCH="x64" || export TARGET_AR
 FROM alpine:3.20
 # FROM oven/bun:1.2.22-alpine
 
+ARG ENV=production
+
 COPY --from=builder /build/dist/settings-sync /usr/bin/settings-sync
 # COPY --from=builder /build/dist/settings-sync.js /home/bun/app/settings-sync.js
 
@@ -22,7 +24,8 @@ RUN apk add gcompat libstdc++ &&\
   addgroup --gid 10000 settingssync && adduser -S --uid 10000 -G settingssync settingssync &&\
   chmod +x /usr/bin/settings-sync
 
-# USER settingssync
+USER settingssync
+ENV NODE_ENV=${ENV}
 
 ENTRYPOINT [ "/usr/bin/settings-sync" ]
 # ENTRYPOINT [ "/usr/bin/env", "bun", "settings-sync.js" ]
