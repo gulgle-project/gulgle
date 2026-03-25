@@ -20,20 +20,23 @@ function isValidRoute(path: string): path is Route {
   return ROUTES.includes(path as Route);
 }
 
+// Extract the route from the URL hash (e.g. "#/settings" -> "/settings")
+function getRouteFromHash(): Route {
+  const hash = window.location.hash;
+  const path = hash.startsWith("#") ? hash.slice(1) : "/";
+  return isValidRoute(path) ? path : "/";
+}
+
 export function RouterProvider({ children }: { children: ReactNode }) {
   const [currentPath, setCurrentPath] = useState<Route>(() => {
     if (typeof window !== "undefined") {
-      const pathname = window.location.pathname;
-      if (isValidRoute(pathname)) {
-        return pathname;
-      }
-      return "/";
+      return getRouteFromHash();
     }
     return "/";
   });
 
   function navigate(path: Route) {
-    window.history.pushState({}, "", path);
+    window.history.pushState({}, "", `#${path}`);
     setCurrentPath(path);
   }
 
@@ -42,23 +45,22 @@ export function RouterProvider({ children }: { children: ReactNode }) {
   }
 
   function replace(path: Route) {
-    window.history.replaceState({}, "", path);
+    window.history.replaceState({}, "", `#${path}`);
     setCurrentPath(path);
   }
 
   useEffect(() => {
-    const pathname = window.location.pathname;
-    setCurrentPath(isValidRoute(pathname) ? pathname : "/");
+    setCurrentPath(getRouteFromHash());
 
-    const handlePopState = () => {
-      const pathname = window.location.pathname;
-      setCurrentPath(isValidRoute(pathname) ? pathname : "/");
+    const handleRouteChange = () => {
+      setCurrentPath(getRouteFromHash());
     };
 
-    window.addEventListener("popstate", handlePopState);
+    // hashchange fires when the URL hash changes, including browser back/forward navigation
+    window.addEventListener("hashchange", handleRouteChange);
 
     return () => {
-      window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener("hashchange", handleRouteChange);
     };
   }, []);
 
