@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Label } from "@/components/ui/label";
 import { useBangManager } from "@/hooks/use-bang-manager.hook";
+import { useSettingsSync } from "@/hooks/use-settings-sync.hook";
 import { cn } from "@/lib/utils";
 import { score } from "@/utils/search.utils";
 
@@ -12,6 +13,7 @@ const WINDOW_SIZE = 100;
 
 export function DefaultBangSelection() {
   const { defaultBang, customBangs, setDefaultBang, getAllBangs } = useBangManager();
+  const { isAuthenticated, syncToCloud } = useSettingsSync();
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const [bangs, setBangs] = useState<Array<Bang>>([]);
@@ -155,6 +157,9 @@ export function DefaultBangSelection() {
                           onSelect={() => {
                             setDefaultBang(bang);
                             setOpen(false);
+                            if (isAuthenticated) {
+                              syncToCloud().catch((error) => console.error("Failed to sync default bang:", error));
+                            }
                           }}
                           value={`!${bang.t} ${bang.s} ${bang.ts?.join(" ") || ""}`}
                         >

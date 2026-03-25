@@ -13,10 +13,12 @@ import {
 } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useBangManager } from "@/hooks/use-bang-manager.hook";
+import { useSettingsSync } from "@/hooks/use-settings-sync.hook";
 import { EditCustomBangForm } from "./custom-bang-form";
 
 export function CustomBangList() {
   const { customBangs, removeCustomBang } = useBangManager();
+  const { isAuthenticated, syncToCloud } = useSettingsSync();
   const [editingBang, setEditingBang] = useState<CustomBang | null>(null);
   const [deletingBang, setDeletingBang] = useState<CustomBang | null>(null);
 
@@ -39,6 +41,10 @@ export function CustomBangList() {
 
     if (editingBang?.t === deletingBang.t) {
       setEditingBang(null);
+    }
+
+    if (isAuthenticated) {
+      syncToCloud().catch((error) => console.error("Failed to sync custom bang deletion:", error));
     }
 
     setDeletingBang(null);
