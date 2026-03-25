@@ -67,7 +67,7 @@ export function useSettingsSync() {
     if (!user) {
       throw new Error("User not authenticated");
     }
-    await bangManager.syncToCloud(user.id);
+    await bangManager.syncToCloud();
   }, [user]);
 
   /**
@@ -84,7 +84,7 @@ export function useSettingsSync() {
     if (!user) {
       throw new Error("User not authenticated");
     }
-    await bangManager.fullSync(user.id);
+    await bangManager.fullSync();
   }, [user]);
 
   /**
@@ -95,7 +95,7 @@ export function useSettingsSync() {
       if (choice === "local" && !user) {
         throw new Error("User not authenticated");
       }
-      await bangManager.resolveConflict(choice, state.serverSettings || undefined, user?.id);
+      await bangManager.resolveConflict(choice, state.serverSettings || undefined);
       setState((prev) => ({ ...prev, status: "idle", serverSettings: null }));
     },
     [state.serverSettings, user],

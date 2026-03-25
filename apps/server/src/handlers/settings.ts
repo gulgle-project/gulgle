@@ -1,6 +1,5 @@
 import { executeQuery } from "../db/db";
 import { SettingsDTOSchema } from "../dtos/settings";
-import { logger } from "../logger";
 import type { RequestContext } from "../middleware/context";
 import { USER_KEY } from "../middleware/context";
 import { type Settings, SettingsSchema } from "../models/settings";

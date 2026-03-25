@@ -289,12 +289,11 @@ class BangManagerState {
   /**
    * Push local settings to cloud
    */
-  async syncToCloud(userId: string): Promise<void> {
+  async syncToCloud(): Promise<void> {
     try {
       this.emit({ type: "SYNC_STARTED" });
 
       const settings: SettingsDTO = {
-        userId,
         customBangs: this.getCustomBangs(),
         defaultBang: this.getDefaultBang(),
         lastModified: new Date(),
@@ -357,7 +356,7 @@ class BangManagerState {
   /**
    * Resolve conflict by choosing local or server settings
    */
-  async resolveConflict(choice: "local" | "server", serverSettings?: SettingsDTO, userId?: string): Promise<void> {
+  async resolveConflict(choice: "local" | "server", serverSettings?: SettingsDTO): Promise<void> {
     if (choice === "server" && serverSettings) {
       // Use server settings
       this.saveCustomBangs(serverSettings.customBangs);
@@ -368,10 +367,9 @@ class BangManagerState {
       }
       this.setLastSyncTime(new Date(serverSettings.lastModified));
       this.emit({ type: "SYNC_SUCCESS", payload: { timestamp: new Date() } });
-    } else if (choice === "local" && userId) {
+    } else if (choice === "local") {
       // Force push local settings
       const settings: SettingsDTO = {
-        userId,
         customBangs: this.getCustomBangs(),
         defaultBang: this.getDefaultBang(),
         lastModified: new Date(),
@@ -387,7 +385,7 @@ class BangManagerState {
   /**
    * Bi-directional sync: pull from server, then push local changes
    */
-  async fullSync(userId: string): Promise<void> {
+  async fullSync(): Promise<void> {
     try {
       this.emit({ type: "SYNC_STARTED" });
 
@@ -407,7 +405,6 @@ class BangManagerState {
       } else {
         // Local is newer or same, push to server
         const settings: SettingsDTO = {
-          userId,
           customBangs: this.getCustomBangs(),
           defaultBang: this.getDefaultBang(),
           lastModified: new Date(),
