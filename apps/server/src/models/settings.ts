@@ -20,7 +20,7 @@ export const SettingsSchema = z.object({
   _id: z.instanceof(ObjectId).optional(),
   userId: z.string(),
   customBangs: z.array(CustomBangSchema).default([]),
-  defaultBang: BangSchema.optional(),
+  defaultBang: BangSchema.nullish(),
   lastModified: z.date(),
 });
 

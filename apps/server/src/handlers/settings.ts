@@ -1,5 +1,6 @@
 import { executeQuery } from "../db/db";
 import { SettingsDTOSchema } from "../dtos/settings";
+import { logger } from "../logger";
 import type { RequestContext } from "../middleware/context";
 import { USER_KEY } from "../middleware/context";
 import { type Settings, SettingsSchema } from "../models/settings";
@@ -14,7 +15,7 @@ export async function pullSettings(req: RequestContext): Promise<Response> {
     const defaultSettings = SettingsSchema.parse({
       userId,
       customBangs: [],
-      defaultBang: undefined,
+      defaultBang: null,
       lastModified: new Date(),
     });
 
@@ -34,7 +35,7 @@ export async function pushSettings(req: RequestContext): Promise<Response> {
 
   if (!stored) {
     // Create new settings if they don't exist
-    const newSettings = SettingsSchema.parse({
+    const newSettings = await SettingsSchema.parseAsync({
       ...parsed,
       userId,
     });
@@ -48,9 +49,8 @@ export async function pushSettings(req: RequestContext): Promise<Response> {
     return new Response("Conflict", { status: 409 });
   }
 
-  const newValue = SettingsSchema.parse({
+  const newValue = await SettingsSchema.parseAsync({
     ...parsed,
-    _id: stored._id,
     userId,
   });
 

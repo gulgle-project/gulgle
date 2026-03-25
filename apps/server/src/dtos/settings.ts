@@ -16,10 +16,9 @@ const CustomBangSchema = BuiltInBangSchema.extend({
 const BangSchema = z.union([BuiltInBangSchema, CustomBangSchema]);
 
 export const SettingsDTOSchema = z.object({
-  userId: z.string(),
   customBangs: z.array(CustomBangSchema).default([]),
-  defaultBang: BangSchema.optional(),
-  lastModified: z.date(),
+  defaultBang: BangSchema.nullish(),
+  lastModified: z.coerce.date(),
 });
 
 export type SettingsDTO = z.infer<typeof SettingsDTOSchema>;
