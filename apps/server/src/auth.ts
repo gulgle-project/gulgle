@@ -6,6 +6,8 @@ import { logger } from "./logger";
 import {
 	type AuthEntity,
 	AuthEntitySchema,
+	type OIDCPlatform,
+	OIDCPlatformValues,
 	type OIDCProvider,
 	type OIDCStage,
 } from "./models/auth";
@@ -73,10 +75,18 @@ export async function oidcLogin(
         break;
     }
 
+		// Read platform from query parameter (defaults to "web")
+		const requestUrl = new URL(req.url);
+		const platformParam = requestUrl.searchParams.get("platform");
+		const platform: OIDCPlatform = platformParam && (OIDCPlatformValues as readonly string[]).includes(platformParam)
+			? (platformParam as OIDCPlatform)
+			: "web";
+
 		const auth = AuthEntitySchema.parse({
 			provider,
 			code_verifier,
 			expectedNonce: nonce,
+			platform,
 		});
 
 		await executeQuery("auth", (col) => col.insertOne(auth));
@@ -120,7 +130,7 @@ export async function oidcLogin(
 		}
 
 		logger.info("Exchanging code for tokens...");
-		const tokens = await codeExchange(code, auth_code);
+		const { tokens, platform } = await codeExchange(code, auth_code);
 
 		const accessToken: string | undefined = tokens.access_token;
 		const refreshToken: string | undefined = tokens.refresh_token;
@@ -162,7 +172,9 @@ export async function oidcLogin(
 		}
 
 		const token = createToken(id.toString());
-		const redirectUrl = getFrontendRedirectUrl(token);
+		const redirectUrl = platform === "ios"
+			? getIOSRedirectUrl(token)
+			: getFrontendRedirectUrl(token);
 
 		logger.debug(`Redirecting to frontend: ${redirectUrl}`);
 
@@ -201,6 +213,10 @@ function getFrontendRedirectUrl(token: string): string {
   return `${baseFrontendUrl}/auth/success#token=${encodeURIComponent(token)}`
 }
 
+function getIOSRedirectUrl(token: string): string {
+  return `gulgle://auth/callback#token=${encodeURIComponent(token)}`;
+}
+
 async function getExternalId(
 	provider: string,
 	token: string,
@@ -227,7 +243,7 @@ async function getExternalId(
 	}
 }
 
-async function codeExchange(code: string, auth_code: string): Promise<Tokens> {
+async function codeExchange(code: string, auth_code: string): Promise<{ tokens: Tokens; platform: OIDCPlatform }> {
 	const auth = await executeQuery("auth", (col) =>
 		col.findOne<AuthEntity>({ auth_code }),
 	);
@@ -236,6 +252,8 @@ async function codeExchange(code: string, auth_code: string): Promise<Tokens> {
 		logger.error("Auth is null!");
 		return Promise.reject();
 	}
+
+	const platform = auth.platform ?? "web";
 
 	if (auth.provider === "github") {
 		const data = new URLSearchParams();
@@ -253,7 +271,7 @@ async function codeExchange(code: string, auth_code: string): Promise<Tokens> {
 			headers: { Accept: "application/json" },
 		}).then((r) => r.json());
 
-		return tokens as Tokens;
+		return { tokens: tokens as Tokens, platform };
 	}
 
   throw new OAuthInvalidProviderError(auth.provider);
