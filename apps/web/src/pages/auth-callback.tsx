@@ -12,14 +12,14 @@ export function AuthCallbackPage() {
     const handleCallback = async () => {
       try {
         // Extract token from URL hash fragment
-        // Backend redirects to: /auth/success#token=xxx
+        // Backend redirects to: /#/auth/success?token=xxx
         const hash = window.location.hash;
-        if (!hash) {
+        if (!hash || !hash.includes("?") || !hash.includes("token=")) {
           setError("No authentication token received");
           return;
         }
 
-        const params = new URLSearchParams(hash.substring(1)); // Remove # from hash
+        const params = new URLSearchParams(hash.substring(hash.indexOf("?") + 1)); // Remove # from hash
         const token = params.get("token");
 
         if (!token) {

@@ -198,7 +198,7 @@ function getRedirectUrl(provider: string): string {
 
 function getFrontendRedirectUrl(token: string): string {
   const baseFrontendUrl = requireEnv("BASE_FRONTEND_URL");
-  return `${baseFrontendUrl}/auth/success#token=${encodeURIComponent(token)}`
+  return `${baseFrontendUrl}/#/auth/success?token=${encodeURIComponent(token)}`
 }
 
 async function getExternalId(
