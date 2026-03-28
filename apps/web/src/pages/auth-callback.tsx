@@ -5,23 +5,13 @@ import { useRouter } from "@/contexts/router-context";
 
 export function AuthCallbackPage() {
   const { login, isAuthenticated } = useAuth();
-  const { navigate, replace } = useRouter();
+  const { queryParams, navigate, replace } = useRouter();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Extract token from URL hash fragment
-        // Backend redirects to: /#/auth/success?token=xxx
-        const hash = window.location.hash;
-        if (!hash || !hash.includes("?") || !hash.includes("token=")) {
-          setError("No authentication token received");
-          return;
-        }
-
-        const params = new URLSearchParams(hash.substring(hash.indexOf("?") + 1)); // Remove # from hash
-        const token = params.get("token");
-
+        const token = queryParams.get("token");
         if (!token) {
           setError("Invalid authentication response");
           return;
@@ -50,7 +40,7 @@ export function AuthCallbackPage() {
       // Already authenticated, redirect to settings
       navigate("/settings");
     }
-  }, [login, navigate, replace, isAuthenticated]);
+  }, [login, navigate, replace, isAuthenticated, queryParams]);
 
   if (error) {
     return (
