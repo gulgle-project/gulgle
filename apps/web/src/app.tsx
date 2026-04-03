@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { Footer } from "./components/layout/footer";
 import { Header } from "./components/layout/header";
 import { ThemeProvider } from "./components/layout/theme-provider";
 import { Toaster } from "./components/ui/sonner";
@@ -49,7 +48,6 @@ function AppContent() {
       <div className="h-dvh flex flex-col items-center bg-white-100 dark:bg-neutral-900 custom-scrollbar overflow-x-hidden overflow-y-auto">
         <Header />
         {page}
-        <Footer />
         <Toaster />
       </div>
     </ThemeProvider>

@@ -1,4 +1,5 @@
 import type { CustomBang } from "gulgle-shared";
+import { Plus, Save } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -109,7 +110,19 @@ function BangForm({
                   Cancel
                 </Button>
               ) : null}
-              <Button type="submit">{bang ? "Save Changes" : "Add Bang"}</Button>
+              <Button type="submit">
+                {bang ? (
+                  <>
+                    <Save />
+                    Save Changes
+                  </>
+                ) : (
+                  <>
+                    <Plus />
+                    Add Bang
+                  </>
+                )}
+              </Button>
             </div>
           </div>
         </div>

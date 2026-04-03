@@ -19,9 +19,9 @@ export function UserMenu() {
 
   if (!isAuthenticated || !user) {
     return (
-      <Button onClick={handleLogin} variant="outline">
+      <Button onClick={handleLogin} variant="ghost">
         <LogIn />
-        Sign In
+        <span className="sr-only">Sign In</span>
       </Button>
     );
   }
@@ -29,12 +29,8 @@ export function UserMenu() {
   return (
     <Popover>
       <PopoverTrigger>
-        <Button className="gap-2" variant="outline">
+        <Button className="gap-2" variant="ghost">
           <UserIcon className="h-4 w-4" />
-          <span className="hidden sm:inline">
-            {user.displayName}
-            {user.email ? ` (${user.email})` : ""}
-          </span>
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-64">

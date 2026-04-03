@@ -17,7 +17,7 @@ export function ThemeToggle() {
   };
 
   return (
-    <Button onClick={handleToggleTheme} size="icon" title={`Theme: ${theme}`} variant="outline">
+    <Button onClick={handleToggleTheme} size="icon" title={`Theme: ${theme}`} variant="ghost">
       <Sun
         className="h-[1.2rem] w-[1.2rem] transition-all data-[theme=light]:scale-100 data-[theme=light]:rotate-0 data-[theme=dark]:scale-0 data-[theme=dark]:-rotate-90 data-[theme=system]:scale-0 data-[theme=system]:-rotate-90"
         data-theme={theme}

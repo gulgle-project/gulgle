@@ -1,3 +1,4 @@
+import { ArrowDownToLine, ArrowUpToLine } from "lucide-react";
 import { useRef } from "react";
 import { toast } from "sonner";
 import { useBangManager } from "@/hooks/use-bang-manager.hook";
@@ -75,11 +76,13 @@ export function ImportExportSettings() {
         <input accept=".json" onChange={handleFileChange} ref={fileInputRef} style={{ display: "none" }} type="file" />
 
         <div className="grid grid-cols-2 gap-4">
-          <Button onClick={handleExport} variant="outline">
-            Export Settings
-          </Button>
-          <Button onClick={handleImport} variant="outline">
+          <Button onClick={handleImport} variant="secondary">
+            <ArrowUpToLine />
             Import Settings
+          </Button>
+          <Button onClick={handleExport} variant="secondary">
+            <ArrowDownToLine />
+            Export Settings
           </Button>
         </div>
       </div>
