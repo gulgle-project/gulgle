@@ -186,7 +186,18 @@ class BangManagerState {
     if (this._allBangs === null) {
       const customBangs = this.getCustomBangs();
       const builtInBangs = await this.getBangs();
-      this._allBangs = [...customBangs, ...builtInBangs];
+
+      // Merge custom and built-in bangs while ensuring trigger uniqueness.
+      // Custom bangs come first so they take precedence over built-in duplicates.
+      const byTrigger = new Map<string, Bang>();
+      for (const bang of [...customBangs, ...builtInBangs]) {
+        const trigger = bang.t.toLowerCase();
+        if (!byTrigger.has(trigger)) {
+          byTrigger.set(trigger, bang);
+        }
+      }
+
+      this._allBangs = Array.from(byTrigger.values());
     }
     return [...this._allBangs];
   }
