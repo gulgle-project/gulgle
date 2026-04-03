@@ -25,26 +25,20 @@ export function SearchPage() {
 
   return (
     <Page centered>
-      <h1 className="text-6xl md:text-7xl font-light mb-16 text-gray-800 dark:text-gray-100 select-none tracking-wide">
-        Gulgle
-      </h1>
+      <h1 className="mb-16 select-none text-8xl">Gulgle</h1>
 
-      <form className="w-full max-w-xl mb-8" onSubmit={onSearch}>
-        <div className="flex items-center h-14 border-2 border-neutral-200 dark:border-neutral-400 bg-transparent dark:bg-input/30 text-black dark:text-white px-4 focus-within:border-black dark:focus-within:border-white transition-colors duration-200 rounded-md">
-          <Input
-            className="flex-1 text-lg border-none shadow-none focus:ring-0 p-2 h-8 focus-visible:border-none focus-visible:ring-0 dark:bg-transparent"
-            name="search"
-            placeholder="Search..."
-            type="text"
-          />
-          <Button
-            className="h-8 w-8 p-0 ml-2 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex-shrink-0"
-            size="sm"
-            type="submit"
-            variant="ghost"
-          >
+      <form className="w-full max-w-3xl mb-8" onSubmit={onSearch}>
+        <div className="flex items-center h-16 px-6 rounded-full border-2 bg">
+          <Button type="submit" variant="ghost">
             <Search />
           </Button>
+          <Input
+            aria-label="Search query"
+            className="h-10 flex-1 border-none bg-transparent p-0 text-xl text-white placeholder:text-white focus:ring-0 focus-visible:border-none focus-visible:ring-0 dark:bg-transparent"
+            name="search"
+            placeholder="What are you looking for?"
+            type="text"
+          />
         </div>
       </form>
 
@@ -62,28 +56,28 @@ export function SearchPage() {
         </p>
       </div>
 
-      <div className="w-full max-w-xl">
-        <div className="mb-2">
-          <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Add as default search engine:</span>
+      <div className="w-full max-w-lg">
+        <div className="mb-3">
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Add as default search engine:</span>
         </div>
-        <div className="flex items-center h-14 border-2 border-neutral-200 dark:border-neutral-400 bg-transparent dark:bg-input/30 text-black dark:text-white px-4 focus-within:border-black dark:focus-within:border-white transition-colors duration-200 rounded-md">
+        <div className="flex h-14 items-center rounded-2xl border px-4 text-gray-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] backdrop-blur-sm transition-all duration-200 focus-within:border-gray-500 dark:border-white/45 dark:bg-white/[0.035] dark:text-white dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.04)] dark:focus-within:border-white/70 dark:focus-within:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_0_18px_rgba(255,255,255,0.08)]">
           <Input
-            className="flex-1 text-lg border-none shadow-none focus:ring-0 p-2 h-8 focus-visible:border-none focus-visible:ring-0 dark:bg-transparent"
+            className="h-10 flex-1 border-none bg-transparent px-2 py-0 text-base font-medium text-gray-800 shadow-none focus:ring-0 focus-visible:border-none focus-visible:ring-0 dark:bg-transparent dark:text-white/90"
             readOnly
             type="text"
             value={searchUrl}
           />
           <Button
-            className="h-8 w-8 p-0 ml-2 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex-shrink-0"
+            className="ml-2 h-9 w-9 flex-shrink-0 rounded-full border border-gray-300 bg-transparent p-0 text-gray-700 transition-colors hover:bg-gray-200/70 hover:text-gray-900 dark:border-white/30 dark:text-white/80 dark:hover:bg-white/12 dark:hover:text-white"
             onClick={copy}
             size="sm"
             variant="ghost"
           >
-            {copied ? <ClipboardCheck /> : <Clipboard />}
+            {copied ? <ClipboardCheck className="h-4 w-4" /> : <Clipboard className="h-4 w-4" />}
           </Button>
         </div>
         <div className="mt-2 h-5">
-          {copied && <span className="text-sm text-green-600 dark:text-green-400">Copied to clipboard!</span>}
+          {copied && <span className="text-sm text-emerald-600 dark:text-emerald-400">Copied to clipboard!</span>}
         </div>
       </div>
     </Page>
