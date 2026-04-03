@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useBangManager } from "@/hooks/use-bang-manager.hook";
-import { EditBangForm } from "./bang-form";
+import { EditCustomBangForm } from "./custom-bang-form";
 
 export function CustomBangList() {
   const { customBangs, removeCustomBang } = useBangManager();
@@ -68,7 +68,7 @@ export function CustomBangList() {
             <DialogDescription>Update your bang trigger, name, and search URL.</DialogDescription>
           </DialogHeader>
           {editingBang && (
-            <EditBangForm bang={editingBang} embedded onClose={() => setEditingBang(null)} showHeading={false} />
+            <EditCustomBangForm bang={editingBang} embedded onClose={() => setEditingBang(null)} showHeading={false} />
           )}
         </DialogContent>
       </Dialog>

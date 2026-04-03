@@ -14,7 +14,7 @@ import { useRouter } from "@/contexts/router-context";
 import { useSettingsSync } from "@/hooks/use-settings-sync.hook";
 import { bangManager } from "@/state/bang-manager";
 
-export function SyncSettings() {
+export function CloudSync() {
   const { isAuthenticated } = useAuth();
   const { navigate } = useRouter();
   const {

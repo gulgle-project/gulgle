@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useBangManager } from "@/hooks/use-bang-manager.hook";
 import { removeLeadingBangs } from "@/utils/bang.utils";
 
-function BangForm({
+function CustomBangForm({
   bang,
   embedded = false,
   onClose,
@@ -143,11 +143,11 @@ function BangForm({
   );
 }
 
-export function AddBangForm() {
-  return <BangForm />;
+export function AddCustomBangForm() {
+  return <CustomBangForm />;
 }
 
-export function EditBangForm({
+export function EditCustomBangForm({
   bang,
   embedded,
   onClose,
@@ -158,5 +158,5 @@ export function EditBangForm({
   onClose: () => void;
   showHeading?: boolean;
 }) {
-  return <BangForm bang={bang} embedded={embedded} onClose={onClose} showHeading={showHeading} />;
+  return <CustomBangForm bang={bang} embedded={embedded} onClose={onClose} showHeading={showHeading} />;
 }

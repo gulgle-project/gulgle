@@ -1,9 +1,9 @@
 import { ArrowDownToLine, ArrowUpToLine } from "lucide-react";
 import { useRef } from "react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { useBangManager } from "@/hooks/use-bang-manager.hook";
-import { Button } from "../ui/button";
-import { Card } from "../ui/card";
 
 export function ImportExportSettings() {
   const fileInputRef = useRef<HTMLInputElement>(null);
