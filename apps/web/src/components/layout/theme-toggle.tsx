@@ -1,51 +1,36 @@
 import { Monitor, Moon, Sun } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { useTheme } from "@/hooks/use-theme.hook";
+import { useTheme } from "./theme-provider";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { setTheme, theme } = useTheme();
 
-  const toggleTheme = () => {
-    if (theme === "light") {
-      setTheme("dark");
-    } else if (theme === "dark") {
-      setTheme("system");
-    } else {
-      setTheme("light");
-    }
-  };
+  const nextTheme = {
+    light: "dark",
+    dark: "system",
+    system: "light",
+  } as const;
 
-  const getIcon = () => {
-    switch (theme) {
-      case "light":
-        return <Sun className="h-4 w-4" />;
-      case "dark":
-        return <Moon className="h-4 w-4" />;
-      case "system":
-        return <Monitor className="h-4 w-4" />;
-    }
-  };
-
-  const getTitle = () => {
-    switch (theme) {
-      case "light":
-        return "Switch to dark mode";
-      case "dark":
-        return "Switch to system theme";
-      case "system":
-        return "Switch to light mode";
-    }
+  const handleToggleTheme = () => {
+    setTheme(nextTheme[theme]);
   };
 
   return (
-    <Button
-      className="h-10 w-10 p-0 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-      onClick={toggleTheme}
-      size="sm"
-      title={getTitle()}
-      variant="ghost"
-    >
-      {getIcon()}
+    <Button onClick={handleToggleTheme} size="icon" title={`Theme: ${theme}`} variant="outline">
+      <Sun
+        className="h-[1.2rem] w-[1.2rem] transition-all data-[theme=light]:scale-100 data-[theme=light]:rotate-0 data-[theme=dark]:scale-0 data-[theme=dark]:-rotate-90 data-[theme=system]:scale-0 data-[theme=system]:-rotate-90"
+        data-theme={theme}
+      />
+      <Moon
+        className="absolute h-[1.2rem] w-[1.2rem] transition-all data-[theme=dark]:scale-100 data-[theme=dark]:rotate-0 data-[theme=light]:scale-0 data-[theme=light]:rotate-90 data-[theme=system]:scale-0 data-[theme=system]:rotate-90"
+        data-theme={theme}
+      />
+      <Monitor
+        className="absolute h-[1.2rem] w-[1.2rem] transition-all data-[theme=system]:scale-100 data-[theme=system]:rotate-0 data-[theme=light]:scale-0 data-[theme=light]:rotate-90 data-[theme=dark]:scale-0 data-[theme=dark]:-rotate-90"
+        data-theme={theme}
+      />
+      <span className="sr-only">Cycle theme (light, dark, system)</span>
     </Button>
   );
 }

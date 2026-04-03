@@ -1,14 +1,13 @@
 import type { Bang } from "gulgle-shared";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useBangManager } from "@/hooks/use-bang-manager.hook";
 import { cn } from "@/lib/utils";
 import { score } from "@/utils/search.utils";
-import { Button } from "../ui/button";
-import { Card } from "../ui/card";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../ui/command";
-import { Label } from "../ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 export function DefaultBangSelection() {
   const { defaultBang, customBangs, setDefaultBang, getAllBangs } = useBangManager();
@@ -55,8 +54,8 @@ export function DefaultBangSelection() {
     .slice(0, 20);
 
   return (
-    <Card className="p-6">
-      <div className="space-y-4">
+    <section className="rounded-xl bg-card p-6 text-card-foreground shadow-xs ring-1 ring-foreground/10">
+      <div className="space-y-3">
         <div>
           <Label className="text-lg font-semibold" htmlFor="default-engine">
             Default Search Engine
@@ -67,8 +66,14 @@ export function DefaultBangSelection() {
         </div>
 
         <Popover onOpenChange={setOpen} open={open}>
-          <PopoverTrigger asChild>
-            <Button aria-expanded={open} className="w-full justify-between" role="combobox" variant="outline">
+          <PopoverTrigger>
+            <Button
+              aria-expanded={open}
+              className="w-full justify-between"
+              id="default-engine"
+              role="combobox"
+              variant="outline"
+            >
               {defaultBang ? `!${defaultBang.t} - ${defaultBang.s}` : "Select default search engine"}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
@@ -98,6 +103,6 @@ export function DefaultBangSelection() {
           </PopoverContent>
         </Popover>
       </div>
-    </Card>
+    </section>
   );
 }

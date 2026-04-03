@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.2.6/schema.json",
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "assist": {
     "actions": {
       "source": {
@@ -11,13 +11,13 @@
   "files": {
     "ignoreUnknown": false,
     "includes": [
-      "**/public/**/*/**",
-      "**/scripts/**/*/**",
-      "**/src/**/*/**",
+      "**/public/**",
+      "**/scripts/**",
+      "**/src/**",
+      "!**/apps/web/src/components/ui",
       "!**/node_modules",
       "!**/dist",
-      "!**/kagi-bangs.ts",
-      "!**/src/old_to_be_deleted"
+      "!**/kagi-bangs.ts"
     ]
   },
   "formatter": {

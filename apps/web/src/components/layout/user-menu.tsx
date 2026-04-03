@@ -1,4 +1,4 @@
-import { LogOut, User as UserIcon } from "lucide-react";
+import { LogIn, LogOut, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/contexts/auth-context";
@@ -19,7 +19,8 @@ export function UserMenu() {
 
   if (!isAuthenticated || !user) {
     return (
-      <Button onClick={handleLogin} size="sm" variant="outline">
+      <Button onClick={handleLogin} variant="outline">
+        <LogIn />
         Sign In
       </Button>
     );
@@ -27,8 +28,8 @@ export function UserMenu() {
 
   return (
     <Popover>
-      <PopoverTrigger asChild>
-        <Button className="gap-2" size="sm" variant="outline">
+      <PopoverTrigger>
+        <Button className="gap-2" variant="outline">
           <UserIcon className="h-4 w-4" />
           <span className="hidden sm:inline">
             {user.displayName}

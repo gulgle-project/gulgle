@@ -1,5 +1,3 @@
-import { Link } from "../ui/link";
-
 const entries = [
   {
     key: "github",
@@ -12,17 +10,6 @@ const entries = [
       >
         GitHub
       </a>
-    ),
-  },
-  {
-    key: "imprint",
-    element: (
-      <Link
-        className="text-muted-foreground hover:text-foreground transition-colors duration-200 text-sm"
-        to="/imprint"
-      >
-        Imprint
-      </Link>
     ),
   },
 ];
