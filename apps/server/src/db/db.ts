@@ -1,5 +1,5 @@
 import mongoDB from "mongodb";
-import { Lock, requireEnv } from "../utils";
+import { requireEnv } from "../utils";
 
 export async function getDb(): Promise<mongoDB.Db> {
   return (await getConnection()).db();
@@ -10,17 +10,30 @@ export async function executeQuery<T>(collection: string, query: (db: mongoDB.Co
   return query(db.collection(collection));
 }
 
-const mutex = new Lock();
 let client: mongoDB.MongoClient | undefined;
+let initializing = false;
 export async function getConnection(): Promise<mongoDB.MongoClient> {
-  await mutex.tryLockAsync();
-
-  if (!client) {
-    const newClient = new mongoDB.MongoClient(requireEnv("MONGO_URL"));
-    await newClient.connect();
-    client = newClient;
+  if (client) {
+    return client;
   }
 
-  mutex.unlock();
+  if (initializing) {
+    while (initializing) {
+      await Atomics.pause(500);
+    }
+
+    if (client) {
+      return client;
+    }
+  }
+
+  initializing = true;
+  const newClient = new mongoDB.MongoClient(requireEnv("MONGO_URL"));
+
+  await newClient.connect();
+
+  client = newClient;
+  initializing = false;
+
   return client;
 }
