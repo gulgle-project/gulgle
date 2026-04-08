@@ -1,4 +1,4 @@
-FROM oven/bun:1.2.22-alpine AS builder
+FROM oven/bun:1.3.11-alpine AS builder
 
 COPY . /build
 WORKDIR /build
@@ -13,7 +13,7 @@ RUN [ "$(uname -m)" = "x86_64" ] && export TARGET_ARCH="x64" || export TARGET_AR
 #   ls -la dist
 
 FROM alpine:3.20
-# FROM oven/bun:1.2.22-alpine
+# FROM oven/bun:1.3.11-alpine
 
 ARG ENV=production
 
