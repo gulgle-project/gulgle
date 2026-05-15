@@ -1,7 +1,7 @@
 import { oidcLogin } from "../auth";
 import { logger } from "../logger";
 
-export async function loginGithub(req: Bun.BunRequest<string>): Promise<Response> {
+export async function loginGithub(req: Request): Promise<Response> {
   try {
     return await oidcLogin("github", "redirect", req);
   } catch (error) {
@@ -10,7 +10,7 @@ export async function loginGithub(req: Bun.BunRequest<string>): Promise<Response
   }
 }
 
-export async function githubResponse(req: Bun.BunRequest<string>): Promise<Response> {
+export async function githubResponse(req: Request): Promise<Response> {
   try {
     return await oidcLogin("github", "response", req);
   } catch (error) {

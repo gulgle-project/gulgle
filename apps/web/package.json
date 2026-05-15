@@ -3,7 +3,6 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "packageManager": "bun@1.3.0",
   "scripts": {
     "dev": "vite --mode dev --open",
     "build": "tsc && vite build",

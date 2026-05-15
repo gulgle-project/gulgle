@@ -3,7 +3,7 @@ export type ContextKey<T> = string & { readonly __type?: T };
 export class RequestContext {
   private additionalData = new Map<string, unknown>();
 
-  constructor(public request: Bun.BunRequest) {}
+  constructor(public request: Request) {}
 
   addData<T>(key: ContextKey<T>, value: T): void {
     this.additionalData.set(key, value);
@@ -20,7 +20,7 @@ export class RequestContext {
     return this.additionalData.get(key) as T;
   }
 
-  getRequest(): Bun.BunRequest {
+  getRequest(): Request {
     return this.request;
   }
 }

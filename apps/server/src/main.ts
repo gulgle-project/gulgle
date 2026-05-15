@@ -1,3 +1,7 @@
+import "dotenv/config";
+import { serve } from "@hono/node-server";
+import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { githubResponse, loginGithub } from "./handlers/auth";
 import { pullSettings, pushSettings } from "./handlers/settings";
 import { getCurrentUser } from "./handlers/user";
@@ -5,74 +9,56 @@ import { logger } from "./logger";
 import { authenticated } from "./middleware/authenticated";
 import { requireEnv } from "./utils";
 
-function createServer(): Bun.Server<unknown> {
+function createServer() {
   logger.info("Creating server...");
 
   const hostname = requireEnv("LISTEN_HOST");
-  const port = requireEnv("LISTEN_PORT");
+  const port = Number.parseInt(requireEnv("LISTEN_PORT"), 10);
 
-  const server = Bun.serve({
-    hostname,
-    port,
-    async fetch(req) {
-      const url = new URL(req.url);
-      logger.info(`${req.method} ${url.pathname}`);
+  if (Number.isNaN(port)) {
+    throw new Error("LISTEN_PORT must be a number");
+  }
 
-      // CORS headers
-      const origin = req.headers.get("Origin") || "*";
-      const corsHeaders = {
-        "Access-Control-Allow-Origin": origin,
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        "Access-Control-Allow-Credentials": "true",
-      };
+  const app = new Hono();
 
-      // Handle preflight requests
-      if (req.method === "OPTIONS") {
-        return new Response(null, { status: 204, headers: corsHeaders });
-      }
-
-      try {
-        let response: Response;
-
-        // Auth routes
-        if (url.pathname === "/api/auth/github" && req.method === "GET") {
-          response = await loginGithub(req as any);
-        } else if (url.pathname === "/api/auth/github/callback" && req.method === "GET") {
-          response = await githubResponse(req as any);
-        } else if (url.pathname === "/api/user/v1.0/current" && req.method === "GET") {
-          // User routes
-          response = await authenticated(getCurrentUser)(req as any);
-        } else if (url.pathname === "/api/settings/v1.0") {
-          // Settings routes
-          if (req.method === "GET") {
-            response = await authenticated(pullSettings)(req as any);
-          } else if (req.method === "PUT") {
-            response = await authenticated(pushSettings)(req as any);
-          } else {
-            response = new Response("Not Found", { status: 404 });
-          }
-        } else {
-          response = new Response("Not Found", { status: 404 });
-        }
-
-        // Add CORS headers to response
-        Object.entries(corsHeaders).forEach(([key, value]) => {
-          response.headers.set(key, value);
-        });
-
-        return response;
-      } catch (error) {
-        logger.error("Request error:", error);
-        return new Response("Internal Server Error", {
-          status: 500,
-          headers: corsHeaders,
-        });
-      }
-    },
+  app.use("*", async (c, next) => {
+    logger.info(`${c.req.method} ${new URL(c.req.url).pathname}`);
+    await next();
   });
 
-  logger.info(`Server created, listening on ${hostname}:${port}`);
+  app.use(
+    "*",
+    cors({
+      origin: (origin) => origin || "*",
+      allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowHeaders: ["Content-Type", "Authorization"],
+      credentials: true,
+    }),
+  );
+
+  app.get("/api/auth/github", (c) => loginGithub(c.req.raw));
+  app.get("/api/auth/github/callback", (c) => githubResponse(c.req.raw));
+  app.get("/api/user/v1.0/current", (c) => authenticated(getCurrentUser)(c.req.raw));
+  app.get("/api/settings/v1.0", (c) => authenticated(pullSettings)(c.req.raw));
+  app.put("/api/settings/v1.0", (c) => authenticated(pushSettings)(c.req.raw));
+
+  app.notFound(() => new Response("Not Found", { status: 404 }));
+
+  app.onError((error) => {
+    logger.error("Request error:", error);
+    return new Response("Internal Server Error", { status: 500 });
+  });
+
+  const server = serve(
+    {
+      fetch: app.fetch,
+      hostname,
+      port,
+    },
+    () => {
+      logger.info(`Server created, listening on ${hostname}:${port}`);
+    },
+  );
 
   return server;
 }
@@ -81,8 +67,16 @@ const server = createServer();
 
 async function shutdown() {
   logger.info("Shutting down...");
-  server.stop();
-  await new Promise((RES) => setTimeout(RES, 3000));
+  await new Promise<void>((resolve, reject) => {
+    server.close((error) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+
+      resolve();
+    });
+  });
   process.exit(0);
 }
 
