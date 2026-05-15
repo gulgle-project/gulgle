@@ -1,18 +1,19 @@
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { getJwtSecret } from "../auth";
+import { redirect } from "../utils";
 import { RequestContext, USER_KEY } from "./context";
-export function authenticated<T extends string>(
+export function authenticated(
   handler: (r: RequestContext) => Promise<Response>,
-): (r: Bun.BunRequest<T>) => Promise<Response> | Response {
+): (r: Request) => Promise<Response> | Response {
   return (req) => {
     if (!req.headers.get("Authorization")) {
-      return Promise.resolve(Response.redirect("/login", 302));
+      return redirect("/login");
     }
 
     const context = new RequestContext(req);
 
     const auth = req.headers.get("Authorization");
-    if (!auth || !auth.startsWith("Bearer ")) {
+    if (!auth?.startsWith("Bearer ")) {
       return new Response(null, { status: 401 });
     }
 
@@ -27,6 +28,10 @@ export function authenticated<T extends string>(
     // If the token cannot be parsed
     if (typeof parsedToken === "string") {
       return new Response(null, { status: 500 });
+    }
+
+    if (typeof parsedToken.userId !== "string") {
+      return new Response(null, { status: 401 });
     }
 
     context.addData(USER_KEY, parsedToken.userId);

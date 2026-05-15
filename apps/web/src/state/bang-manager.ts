@@ -447,4 +447,5 @@ class BangManagerState {
 
 // Create singleton instance
 const bangManager = new BangManagerState();
-export { bangManager, BangManagerState };
+
+export { BangManagerState, bangManager };
