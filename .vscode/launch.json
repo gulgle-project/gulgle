@@ -1,13 +1,13 @@
 {
   "configurations": [
     {
-      "name": "Launch Program",
+      "name": "Launch Server",
       "program": "${workspaceFolder}/apps/server/src/main.ts",
       "request": "launch",
-      // "skipFiles": [
-      //   "<node_internals>/**"
-      // ],
-      "type": "bun"
+      "runtimeArgs": ["--import", "tsx"],
+      "cwd": "${workspaceFolder}/apps/server",
+      "envFile": "${workspaceFolder}/apps/server/.env.local",
+      "type": "node"
     }
   ]
 }

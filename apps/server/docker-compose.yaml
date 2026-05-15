@@ -8,13 +8,16 @@ services:
     ports:
       - 27017:27017
   settings-sync:
-    build: .
+    build:
+      context: ../..
+      dockerfile: apps/server/Dockerfile
     restart: always
     environment:
       LISTEN_HOST: 0.0.0.0
       LISTEN_PORT: 8080
       MONGO_URL: mongodb://root:pass@mongo:27017
       BASE_URL: http://localhost:8080
+      BASE_FRONTEND_URL: http://localhost:5173
       JWT_SECRET: VHhEwqgRNZWwYZCl8aOfQ/VDVIl+yBuQtR+VbdUMxmA=
       GITHUB_CLIENT_ID: your_github_client_id
       GITHUB_CLIENT_SECRET: your_github_client_secret

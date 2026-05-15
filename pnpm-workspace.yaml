@@ -1,0 +1,12 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+  - "scripts"
+
+allowBuilds:
+  esbuild: true
+  msw: true
+
+onlyBuiltDependencies:
+  - esbuild
+  - msw

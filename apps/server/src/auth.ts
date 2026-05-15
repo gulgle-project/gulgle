@@ -18,7 +18,8 @@ import { getBaseUrl, internalServerError, requireEnv } from "./utils";
 const CODE_CHALLENGE_METHOD = "S256";
 const COOKIE_AUTH_CODE = "sso-auth-code";
 
-const { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } = process.env;
+const GITHUB_CLIENT_ID = requireEnv("GITHUB_CLIENT_ID");
+const GITHUB_CLIENT_SECRET = requireEnv("GITHUB_CLIENT_SECRET");
 
 type OAuthUser = {
   externalId: string;
@@ -26,10 +27,15 @@ type OAuthUser = {
   email?: string;
 };
 
-if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
-  console.error("Please provice github oauth params.");
-  process.exit(1);
-}
+type GitHubUser = {
+  id: number | string;
+  name?: string | null;
+  email?: string | null;
+};
+
+type StoredUser = Omit<User, "externalId"> & {
+  externalId: string | number;
+};
 
 const githubConfig = new client.Configuration(
   {
@@ -47,11 +53,7 @@ export type Tokens = {
   id_token?: string;
 };
 
-export async function oidcLogin(
-  provider: OIDCProvider,
-  stage: OIDCStage,
-  req: Bun.BunRequest<string>,
-): Promise<Response> {
+export async function oidcLogin(provider: OIDCProvider, stage: OIDCStage, req: Request): Promise<Response> {
   if (stage === "redirect") {
     let nonce: string | undefined;
     const code_verifier = client.randomPKCECodeVerifier();
@@ -148,8 +150,14 @@ export async function oidcLogin(
       return internalServerError();
     }
 
+    const externalIds: Array<string | number> = [externalUser.externalId];
+    const legacyExternalId = Number(externalUser.externalId);
+    if (Number.isSafeInteger(legacyExternalId)) {
+      externalIds.push(legacyExternalId);
+    }
+
     const user = await executeQuery("user", (col) =>
-      col.findOne<User>({ provider, externalId: externalUser.externalId }),
+      col.findOne<StoredUser>({ provider, externalId: { $in: externalIds } }),
     );
 
     let id: ObjectId;
@@ -162,14 +170,28 @@ export async function oidcLogin(
       ).insertedId;
     } else {
       logger.info("User found, using existing ID");
-      id = user._id!;
+      if (!user._id) {
+        logger.error("User found without ID");
+        return internalServerError();
+      }
+
+      id = user._id;
 
       // Update if out of date
       user.displayName = externalUser.displayName;
       user.email = externalUser.email;
 
       await executeQuery("user", (col) =>
-        col.updateOne({ _id: id }, { $set: { displayName: user.displayName, email: user.email } }),
+        col.updateOne(
+          { _id: id },
+          {
+            $set: {
+              externalId: externalUser.externalId,
+              displayName: user.displayName,
+              email: user.email,
+            },
+          },
+        ),
       );
     }
 
@@ -226,10 +248,10 @@ async function getExternalId(provider: string, token: string): Promise<OAuthUser
           Accept: "application/vnd.github+json",
           "X-GitHub-Api-Version": "2026-03-10",
         },
-      }).then((r) => r.json())) as any;
+      }).then((r) => r.json())) as GitHubUser;
 
       return {
-        externalId: user.id,
+        externalId: user.id.toString(),
         displayName: !user.name ? undefined : user.name,
         email: !user.email ? undefined : user.email,
       };
@@ -253,8 +275,8 @@ async function codeExchange(code: string, auth_code: string): Promise<{ tokens: 
   if (auth.provider === "github") {
     const data = new URLSearchParams();
 
-    data.append("client_id", GITHUB_CLIENT_ID!);
-    data.append("client_secret", GITHUB_CLIENT_SECRET!);
+    data.append("client_id", GITHUB_CLIENT_ID);
+    data.append("client_secret", GITHUB_CLIENT_SECRET);
     data.append("code", code);
     data.append("code_verifier", auth.code_verifier);
     data.append("nonce", auth.expectedNonce);

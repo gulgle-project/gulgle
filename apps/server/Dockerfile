@@ -1,31 +1,32 @@
-FROM oven/bun:1.2.22-alpine AS builder
+FROM node:24-alpine AS builder
 
-COPY . /build
-WORKDIR /build
+WORKDIR /app
 
-RUN [ "$(uname -m)" = "x86_64" ] && export TARGET_ARCH="x64" || export TARGET_ARCH="$(uname -m)"; \
-  bun install &&\
-  bun build src/main.ts --target=bun-linux-${TARGET_ARCH}-musl --compile --outfile=dist/settings-sync &&\
-  ls -la dist
+RUN corepack enable
 
-# RUN bun install &&\
-#   bun build src/main.ts --target=bun --minify --outfile=dist/settings-sync.js &&\
-#   ls -la dist
+COPY . .
 
-FROM alpine:3.20
-# FROM oven/bun:1.2.22-alpine
+RUN pnpm install --frozen-lockfile && \
+  pnpm --filter gulgle-server build
+
+FROM node:24-alpine AS runtime
 
 ARG ENV=production
-
-COPY --from=builder /build/dist/settings-sync /usr/bin/settings-sync
-# COPY --from=builder /build/dist/settings-sync.js /home/bun/app/settings-sync.js
-
-RUN apk add gcompat libstdc++ &&\
-  addgroup --gid 10000 settingssync && adduser -S --uid 10000 -G settingssync settingssync &&\
-  chmod +x /usr/bin/settings-sync
-
-USER settingssync
 ENV NODE_ENV=${ENV}
 
-ENTRYPOINT [ "/usr/bin/settings-sync" ]
-# ENTRYPOINT [ "/usr/bin/env", "bun", "settings-sync.js" ]
+WORKDIR /app
+
+RUN corepack enable && \
+  addgroup --gid 10000 settingssync && \
+  adduser -S --uid 10000 -G settingssync settingssync
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/server/package.json apps/server/package.json
+RUN pnpm install --frozen-lockfile --prod --filter gulgle-server
+
+COPY --from=builder /app/apps/server/dist apps/server/dist
+
+USER settingssync
+WORKDIR /app/apps/server
+
+ENTRYPOINT ["node", "dist/main.mjs"]

@@ -3,13 +3,20 @@
 To install dependencies:
 
 ```bash
-bun install
+pnpm install
 ```
 
-To run:
+To run the development server:
+
+Configuration is loaded from `.env.local` and then `.env`; see `.env.template` for the required variables.
 
 ```bash
-bun run index.ts
+pnpm --filter gulgle-server dev
 ```
 
-This project was created using `bun init` in bun v1.2.22. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+To build and start the Node.js service:
+
+```bash
+pnpm --filter gulgle-server build
+pnpm --filter gulgle-server start
+```
