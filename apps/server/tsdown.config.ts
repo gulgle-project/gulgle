@@ -5,7 +5,7 @@ export default defineConfig({
   outDir: "dist",
   format: "esm",
   platform: "node",
-  target: "node22",
+  target: "node24",
   clean: true,
   sourcemap: true,
   dts: false,

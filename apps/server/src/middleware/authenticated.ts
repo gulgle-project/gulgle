@@ -12,7 +12,7 @@ export function authenticated(
     const context = new RequestContext(req);
 
     const auth = req.headers.get("Authorization");
-    if (!auth || !auth.startsWith("Bearer ")) {
+    if (!auth?.startsWith("Bearer ")) {
       return new Response(null, { status: 401 });
     }
 

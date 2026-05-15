@@ -1,4 +1,4 @@
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
@@ -9,7 +9,7 @@ COPY . .
 RUN pnpm install --frozen-lockfile && \
   pnpm --filter gulgle-server build
 
-FROM node:22-alpine AS runtime
+FROM node:24-alpine AS runtime
 
 ARG ENV=production
 ENV NODE_ENV=${ENV}

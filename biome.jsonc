@@ -8,6 +8,11 @@
       }
     }
   },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
   "files": {
     "ignoreUnknown": false,
     "includes": [
@@ -53,7 +58,9 @@
         "useFilenamingConvention": {
           "level": "error",
           "options": {
-            "filenameCases": ["kebab-case"],
+            "filenameCases": [
+              "kebab-case"
+            ],
             "match": "%?(.+?)[.](.+)",
             "requireAscii": true,
             "strictCase": true
