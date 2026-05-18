@@ -1,31 +1,34 @@
 {
   "name": "gulgle-server",
-  "module": "src/main.ts",
+  "main": "dist/main.mjs",
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "bun build --compile --outfile=dist/settings-sync src/main.ts",
-    "dev": "bun --watch src/main.ts",
+    "build": "tsdown",
+    "dev": "tsx watch src/main.ts",
+    "start": "node dist/main.mjs",
     "biome:check": "biome check .",
     "biome:write": "biome check . --write",
     "biome:ci": "biome ci .",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.2.4",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/openid-client": "^3.7.0"
+    "tsdown": "^0.22.0",
+    "tsx": "^4.22.0"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "^6"
   },
   "dependencies": {
-    "bson": "^6.10.4",
-    "dotenv": "^17.2.2",
-    "jsonwebtoken": "^9.0.2",
-    "mongodb": "^6.20.0",
-    "openid-client": "^6.8.0",
-    "winston": "^3.17.0",
-    "zod": "^4.1.11"
+    "@hono/node-server": "^2.0.2",
+    "bson": "^7.2.0",
+    "dotenv": "^17.4.2",
+    "hono": "^4.12.18",
+    "jsonwebtoken": "^9.0.3",
+    "mongodb": "^7.2.0",
+    "openid-client": "^6.8.4",
+    "winston": "^3.19.0",
+    "zod": "^4.4.3"
   }
 }
