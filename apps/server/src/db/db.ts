@@ -10,30 +10,19 @@ export async function executeQuery<T>(collection: string, query: (db: mongoDB.Co
   return query(db.collection(collection));
 }
 
-let client: mongoDB.MongoClient | undefined;
-let initializing = false;
+let connection: Promise<mongoDB.MongoClient> | undefined;
 export async function getConnection(): Promise<mongoDB.MongoClient> {
-  if (client) {
-    return client;
+  if (!connection) {
+    connection = new mongoDB.MongoClient(requireEnv("MONGO_URL")).connect();
   }
+  const pendingConnection = connection;
 
-  if (initializing) {
-    while (initializing) {
-      await Atomics.pause(500);
+  try {
+    return await pendingConnection;
+  } catch (error) {
+    if (connection === pendingConnection) {
+      connection = undefined;
     }
-
-    if (client) {
-      return client;
-    }
+    throw error;
   }
-
-  initializing = true;
-  const newClient = new mongoDB.MongoClient(requireEnv("MONGO_URL"));
-
-  await newClient.connect();
-
-  client = newClient;
-  initializing = false;
-
-  return client;
 }
