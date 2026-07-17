@@ -1,12 +1,27 @@
+import { ObjectId } from "bson";
 import { executeQuery } from "../db/db";
 import { SettingsDTOSchema } from "../dtos/settings";
 import type { RequestContext } from "../middleware/context";
 import { USER_KEY } from "../middleware/context";
 import { type Settings, SettingsSchema } from "../models/settings";
+import type User from "../models/user";
 import { wrapOrNotFound } from "../utils";
+
+async function userExists(userId: string): Promise<boolean> {
+  if (!ObjectId.isValid(userId)) {
+    return false;
+  }
+
+  const user = await executeQuery("user", (col) => col.findOne<User>({ _id: new ObjectId(userId) }));
+  return user !== null;
+}
 
 export async function pullSettings(req: RequestContext): Promise<Response> {
   const userId = req.requireData(USER_KEY);
+  if (!(await userExists(userId))) {
+    return new Response(null, { status: 401 });
+  }
+
   let settings = await executeQuery("settings", (col) => col.findOne<Settings>({ userId }));
 
   // If no settings exist, create default settings
@@ -29,6 +44,10 @@ export async function pushSettings(req: RequestContext): Promise<Response> {
   const body = await req.request.json();
   const parsed = await SettingsDTOSchema.parseAsync(body);
   const userId = req.requireData(USER_KEY);
+
+  if (!(await userExists(userId))) {
+    return new Response(null, { status: 401 });
+  }
 
   const stored = await executeQuery("settings", (col) => col.findOne<Settings>({ userId }));
 
