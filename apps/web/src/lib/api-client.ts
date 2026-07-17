@@ -168,6 +168,15 @@ export async function getCurrentUser(): Promise<User> {
 }
 
 /**
+ * Permanently delete the current account and its cloud data.
+ */
+export async function deleteAccount(): Promise<void> {
+  return authenticatedFetch<void>("/api/user/v1.0/current", {
+    method: "DELETE",
+  });
+}
+
+/**
  * Pull settings from server
  */
 export async function pullSettings(): Promise<SettingsDTO> {
@@ -196,6 +205,7 @@ export function initiateGithubLogin(): void {
 
 // Export API client as a namespace
 export const apiClient = {
+  deleteAccount,
   getCurrentUser,
   pullSettings,
   pushSettings,
