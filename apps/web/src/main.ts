@@ -1,4 +1,10 @@
+import { registerSW } from "virtual:pwa-register";
 import { doRedirect } from "./utils/redirect.utils";
+
+// In auto-update mode the plugin activates the new worker immediately and
+// reloads existing clients once it takes control. Its dev implementation is a
+// no-op, so local development never tries to register a missing /sw.js.
+registerSW({ immediate: true });
 
 (async () => {
   if (!(await doRedirect())) {
