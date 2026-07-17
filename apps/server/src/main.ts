@@ -4,7 +4,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { githubResponse, loginGithub } from "./handlers/auth";
 import { pullSettings, pushSettings } from "./handlers/settings";
-import { getCurrentUser } from "./handlers/user";
+import { deleteCurrentUser, getCurrentUser } from "./handlers/user";
 import { logger } from "./logger";
 import { authenticated } from "./middleware/authenticated";
 import { requireEnv } from "./utils";
@@ -41,6 +41,7 @@ function createServer() {
   app.get("/api/auth/github", (c) => loginGithub(c.req.raw));
   app.get("/api/auth/github/callback", (c) => githubResponse(c.req.raw));
   app.get("/api/user/v1.0/current", (c) => authenticated(getCurrentUser)(c.req.raw));
+  app.delete("/api/user/v1.0/current", (c) => authenticated(deleteCurrentUser)(c.req.raw));
   app.get("/api/settings/v1.0", (c) => authenticated(pullSettings)(c.req.raw));
   app.put("/api/settings/v1.0", (c) => authenticated(pushSettings)(c.req.raw));
 
