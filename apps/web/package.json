@@ -7,6 +7,7 @@
     "dev": "vite --mode dev --open",
     "build": "tsc && vite build",
     "preview": "vite preview",
+    "test": "node --import tsx --test src/lib/api-client.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

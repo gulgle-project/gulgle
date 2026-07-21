@@ -1,8 +1,10 @@
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from "react";
+import { authenticatedFetch, onAuthExpired, refreshAccessToken, revokeRefreshToken } from "@/lib/api-client";
 
 // Storage keys
 const TOKEN_STORAGE_KEY = "auth-token";
 const USER_STORAGE_KEY = "auth-user";
+const EXPLICIT_LOGOUT_STORAGE_KEY = "auth-explicitly-logged-out";
 
 // Types
 export type User = {
@@ -19,8 +21,8 @@ export type AuthState = {
 };
 
 export type AuthContextValue = AuthState & {
-  login: (token: string) => Promise<void>;
-  logout: () => void;
+  login: (token?: string) => Promise<void>;
+  logout: () => Promise<void>;
   clearError: () => void;
   setToken: (token: string) => void;
 };
@@ -77,6 +79,30 @@ function removeStoredUser(): void {
   }
 }
 
+function isExplicitlyLoggedOut(): boolean {
+  try {
+    return localStorage.getItem(EXPLICIT_LOGOUT_STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function setExplicitlyLoggedOut(): void {
+  try {
+    localStorage.setItem(EXPLICIT_LOGOUT_STORAGE_KEY, "true");
+  } catch (error) {
+    console.error("Failed to persist logout state:", error);
+  }
+}
+
+function clearExplicitLogout(): void {
+  try {
+    localStorage.removeItem(EXPLICIT_LOGOUT_STORAGE_KEY);
+  } catch (error) {
+    console.error("Failed to clear logout state:", error);
+  }
+}
+
 // Decode JWT to check expiration (basic implementation without jwt-decode library)
 function isTokenExpired(token: string): boolean {
   try {
@@ -113,22 +139,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Fetch current user from API
   const fetchCurrentUser = useCallback(async (token: string): Promise<User | null> => {
     try {
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
-      const response = await fetch(`${apiBaseUrl}/api/user/v1.0/current`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      // Keep bootstrap and callback requests on the same one-refresh-and-retry
+      // path as normal API calls.
+      return await authenticatedFetch<User>("/api/user/v1.0/current", {
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error("Authentication failed");
-        }
-        throw new Error("Failed to fetch user");
-      }
-
-      const user = await response.json();
-      return user;
     } catch (error) {
       console.error("Error fetching user:", error);
       throw error;
@@ -137,29 +152,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Login function - stores token and fetches user
   const login = useCallback(
-    async (token: string) => {
+    async (token?: string) => {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
       try {
-        // Validate token format
-        if (!token || isTokenExpired(token)) {
+        // Browser logins receive the durable credential in an HttpOnly cookie;
+        // iOS may supply its one-time access token through its app callback.
+        const accessToken = token ?? (await refreshAccessToken());
+        if (!accessToken || isTokenExpired(accessToken)) {
           throw new Error("Invalid or expired token");
         }
 
         // Fetch user data
-        const user = await fetchCurrentUser(token);
+        const user = await fetchCurrentUser(accessToken);
 
         if (!user) {
           throw new Error("Failed to fetch user data");
         }
 
         // Store token and user
-        setStoredToken(token);
+        setStoredToken(accessToken);
         setStoredUser(user);
+        clearExplicitLogout();
 
         setState({
           user,
-          token,
+          token: accessToken,
           isAuthenticated: true,
           isLoading: false,
           error: null,
@@ -182,8 +200,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [fetchCurrentUser],
   );
 
-  // Logout function
-  const logout = useCallback(() => {
+  const clearLocalAuth = useCallback(() => {
     removeStoredToken();
     removeStoredUser();
     setState({
@@ -194,6 +211,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       error: null,
     });
   }, []);
+
+  // Logout clears this tab immediately, but waits for the best-effort server
+  // revocation so a later bootstrap cannot silently restore the session.
+  const logout = useCallback(async () => {
+    setExplicitlyLoggedOut();
+    clearLocalAuth();
+    try {
+      await revokeRefreshToken();
+    } catch (error) {
+      console.error("Failed to revoke refresh token:", error);
+    }
+  }, [clearLocalAuth]);
+
+  useEffect(() => onAuthExpired(clearLocalAuth), [clearLocalAuth]);
 
   // Set token directly (for callback page)
   const setToken = useCallback((token: string) => {
@@ -209,17 +240,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Initialize auth state from localStorage on mount
   useEffect(() => {
     const initializeAuth = async () => {
-      const storedToken = getStoredToken();
-      const storedUser = getStoredUser();
-
-      if (!storedToken) {
+      if (isExplicitlyLoggedOut()) {
         setState((prev) => ({ ...prev, isLoading: false }));
         return;
       }
 
-      // Check if token is expired
+      const storedToken = getStoredToken();
+      const storedUser = getStoredUser();
+
+      if (!storedToken) {
+        // The access token is only a cache. A previously authenticated browser
+        // may have a valid HttpOnly refresh cookie even when local storage was
+        // cleared (or in a newly opened tab), so bootstrap from that cookie.
+        const freshToken = await refreshAccessToken();
+        if (!freshToken) {
+          setState((prev) => ({ ...prev, isLoading: false }));
+          return;
+        }
+        const user = await fetchCurrentUser(freshToken).catch(() => null);
+        if (!user) {
+          clearLocalAuth();
+          return;
+        }
+        setStoredUser(user);
+        setState({ user, token: freshToken, isAuthenticated: true, isLoading: false, error: null });
+        return;
+      }
+
+      // An access token is intentionally short lived. Restore it with the
+      // HttpOnly refresh cookie instead of treating expiry as a logout.
       if (isTokenExpired(storedToken)) {
-        logout();
+        const freshToken = await refreshAccessToken();
+        if (!freshToken) {
+          clearLocalAuth();
+          return;
+        }
+        const user = await fetchCurrentUser(freshToken).catch(() => null);
+        if (!user) {
+          clearLocalAuth();
+          return;
+        }
+        setStoredUser(user);
+        setState({ user, token: freshToken, isAuthenticated: true, isLoading: false, error: null });
         return;
       }
 
@@ -248,16 +310,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             error: null,
           });
         } else {
-          logout();
+          clearLocalAuth();
         }
       } catch (error) {
         console.error("Failed to initialize auth:", error);
-        logout();
+        clearLocalAuth();
       }
     };
 
     initializeAuth();
-  }, [fetchCurrentUser, logout]);
+  }, [clearLocalAuth, fetchCurrentUser]);
 
   const value: AuthContextValue = {
     ...state,

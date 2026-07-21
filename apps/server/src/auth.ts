@@ -13,10 +13,14 @@ import {
   type OIDCStage,
 } from "./models/auth";
 import User from "./models/user";
+import { ACCESS_TOKEN_TTL, REFRESH_TOKEN_TTL_MS, RefreshTokenService } from "./refresh-tokens";
+import { mongoRefreshSessionStore } from "./repositories/refresh-session";
 import { getBaseUrl, internalServerError, requireEnv } from "./utils";
 
 const CODE_CHALLENGE_METHOD = "S256";
 const COOKIE_AUTH_CODE = "sso-auth-code";
+export const REFRESH_COOKIE = "gulgle-refresh";
+const refreshTokenService = new RefreshTokenService(mongoRefreshSessionStore);
 
 const GITHUB_CLIENT_ID = requireEnv("GITHUB_CLIENT_ID");
 const GITHUB_CLIENT_SECRET = requireEnv("GITHUB_CLIENT_SECRET");
@@ -100,7 +104,7 @@ export async function oidcLogin(provider: OIDCProvider, stage: OIDCStage, req: R
       status: 302,
       headers: {
         Location: authUrl,
-        "Set-Cookie": `${COOKIE_AUTH_CODE}=${auth.auth_code.toString()}; HttpOnly; Path=/; SameSite=Lax`,
+        "Set-Cookie": authCodeCookie(auth.auth_code.toString(), req),
       },
     });
 
@@ -135,7 +139,6 @@ export async function oidcLogin(provider: OIDCProvider, stage: OIDCStage, req: R
     const { tokens, platform } = await codeExchange(code, auth_code);
 
     const accessToken: string | undefined = tokens.access_token;
-    const refreshToken: string | undefined = tokens.refresh_token;
 
     if (!accessToken) {
       logger.error("No access token received from OAuth provider");
@@ -196,17 +199,18 @@ export async function oidcLogin(provider: OIDCProvider, stage: OIDCStage, req: R
     }
 
     const token = createToken(id.toString());
-    const redirectUrl = platform === "ios" ? getIOSRedirectUrl(token) : getFrontendRedirectUrl(token);
+    const refreshToken = await refreshTokenService.create(id.toString());
+    const redirectUrl = platform === "ios" ? getIOSRedirectUrl(token, refreshToken) : getFrontendRedirectUrl();
 
-    logger.debug(`Redirecting to frontend: ${redirectUrl}`);
+    logger.debug(`Redirecting authenticated ${platform} client`);
 
     // Delete the auth cookie and redirect
+    const headers = new Headers({ Location: redirectUrl });
+    headers.append("Set-Cookie", clearAuthCodeCookie(req));
+    headers.append("Set-Cookie", refreshCookie(refreshToken, req));
     return new Response(null, {
       status: 302,
-      headers: {
-        Location: redirectUrl,
-        "Set-Cookie": `${COOKIE_AUTH_CODE}=; HttpOnly; Path=/; Max-Age=0`,
-      },
+      headers,
     });
   }
 
@@ -230,13 +234,13 @@ function getRedirectUrl(provider: string): string {
   throw new OAuthInvalidProviderError(provider);
 }
 
-function getFrontendRedirectUrl(token: string): string {
+function getFrontendRedirectUrl(): string {
   const baseFrontendUrl = requireEnv("BASE_FRONTEND_URL");
-  return `${baseFrontendUrl}/#/auth/success?token=${encodeURIComponent(token)}`;
+  return `${baseFrontendUrl}/#/auth/success`;
 }
 
-function getIOSRedirectUrl(token: string): string {
-  return `gulgle://auth/callback#token=${encodeURIComponent(token)}`;
+function getIOSRedirectUrl(token: string, refreshToken: string): string {
+  return `gulgle://auth/callback#token=${encodeURIComponent(token)}&refresh_token=${encodeURIComponent(refreshToken)}`;
 }
 
 async function getExternalId(provider: string, token: string): Promise<OAuthUser | undefined> {
@@ -294,8 +298,117 @@ async function codeExchange(code: string, auth_code: string): Promise<{ tokens: 
   throw new OAuthInvalidProviderError(auth.provider);
 }
 
-function createToken(userId: string): string {
-  return jwt.sign({ userId: userId }, getJwtSecret(), { expiresIn: "1D" });
+export function createToken(userId: string): string {
+  return jwt.sign({ userId }, getJwtSecret(), { expiresIn: ACCESS_TOKEN_TTL });
+}
+
+export async function refreshAccessToken(req: Request): Promise<Response> {
+  try {
+    const cookieRefreshToken = getCookie(req, REFRESH_COOKIE);
+    const refreshToken = cookieRefreshToken ?? (await getRefreshTokenFromBody(req));
+    const rotated = await refreshTokenService.rotate(refreshToken);
+    if (!rotated) {
+      if (refreshToken) {
+        // A presented but rejected token means an expired session or a replayed
+        // (possibly stolen) token that revoked its family. Worth surfacing.
+        logger.warn("Refresh token rotation rejected");
+      }
+      return new Response(null, { status: 401, headers: { "Set-Cookie": clearRefreshCookie(req) } });
+    }
+
+    // Native clients present the token in the request body because they cannot
+    // use the browser's HttpOnly cookie. Return the rotated successor to them.
+    const body = cookieRefreshToken
+      ? { accessToken: createToken(rotated.userId) }
+      : { accessToken: createToken(rotated.userId), refreshToken: rotated.token };
+    return Response.json(body, { headers: { "Set-Cookie": refreshCookie(rotated.token, req) } });
+  } catch (error) {
+    logger.error("Refresh token error:", error);
+    return new Response(null, { status: 401, headers: { "Set-Cookie": clearRefreshCookie(req) } });
+  }
+}
+
+async function getRefreshTokenFromBody(req: Request): Promise<string | undefined> {
+  if (!req.headers.get("Content-Type")?.includes("application/json")) {
+    return undefined;
+  }
+
+  const body: unknown = await req.json();
+  if (!body || typeof body !== "object") {
+    return undefined;
+  }
+  // Must match the `refreshToken` key returned by the refresh endpoint's JSON body.
+  const refreshToken = (body as { refreshToken?: unknown }).refreshToken;
+  return typeof refreshToken === "string" ? refreshToken : undefined;
+}
+
+export async function logout(req: Request): Promise<Response> {
+  try {
+    await refreshTokenService.revoke(getCookie(req, REFRESH_COOKIE));
+  } catch (error) {
+    // Local logout must still remove the browser credential if persistence is unavailable.
+    logger.error("Logout error:", error);
+  }
+  return new Response(null, { status: 204, headers: { "Set-Cookie": clearRefreshCookie(req) } });
+}
+
+function getCookie(req: Request, name: string): string | undefined {
+  const cookie = req.headers.get("Cookie");
+  if (!cookie) {
+    return undefined;
+  }
+
+  for (const part of cookie.split(";")) {
+    const [key, ...value] = part.trim().split("=");
+    if (key === name) {
+      return value.join("=");
+    }
+  }
+  return undefined;
+}
+
+function refreshCookie(token: string, req: Request): string {
+  // The refresh cookie is only ever presented by same-site fetches to
+  // /api/auth, so Strict adds CSRF protection without breaking any flow.
+  return `${REFRESH_COOKIE}=${token}; HttpOnly; Path=/api/auth; Max-Age=${Math.floor(
+    REFRESH_TOKEN_TTL_MS / 1000,
+  )}; SameSite=Strict${secureAttribute(req)}`;
+}
+
+function clearRefreshCookie(req: Request): string {
+  return `${REFRESH_COOKIE}=; HttpOnly; Path=/api/auth; Max-Age=0; SameSite=Strict${secureAttribute(req)}`;
+}
+
+function authCodeCookie(authCode: string, req: Request): string {
+  // Lax (not Strict) is required. Although we both set and read this cookie,
+  // SameSite is evaluated against the site that *initiates* the request, not
+  // the one that set the cookie: the /callback request is a top-level
+  // redirect initiated by the OAuth provider (github.com), which browsers
+  // treat as cross-site and therefore omit Strict cookies from, breaking
+  // login. Lax cookies are still sent on top-level GET navigations.
+  return `${COOKIE_AUTH_CODE}=${authCode}; HttpOnly; Path=/; SameSite=Lax${secureAttribute(req)}`;
+}
+
+function clearAuthCodeCookie(req: Request): string {
+  return `${COOKIE_AUTH_CODE}=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax${secureAttribute(req)}`;
+}
+
+function secureAttribute(req: Request): string {
+  // Outside local development the Secure attribute is mandatory, regardless
+  // of what protocol the (possibly misconfigured) proxy chain reports.
+  // Only plain-http requests in a dev environment may omit it.
+  const isDevEnv = process.env.NODE_ENV === undefined || process.env.NODE_ENV === "development";
+  return isDevEnv && !isSecureRequest(req) ? "" : "; Secure";
+}
+
+function isSecureRequest(req: Request): boolean {
+  if (new URL(req.url).protocol === "https:") {
+    return true;
+  }
+
+  // Proxies may append their protocol to an existing forwarded chain.
+  const forwardedProto = req.headers.get("X-Forwarded-Proto")?.split(",")[0]?.trim().toLowerCase();
+  return forwardedProto === "https";
 }
 
 export function getJwtSecret() {

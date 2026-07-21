@@ -2,11 +2,13 @@ import "./env";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { githubResponse, loginGithub } from "./handlers/auth";
+import { logout, refreshAccessToken } from "./auth";
+import { githubResponse, loginGithub } from "./handlers/github-auth";
 import { pullSettings, pushSettings } from "./handlers/settings";
 import { getCurrentUser } from "./handlers/user";
 import { logger } from "./logger";
 import { authenticated } from "./middleware/authenticated";
+import { ensureRefreshSessionIndexes } from "./repositories/refresh-session";
 import { requireEnv } from "./utils";
 
 const SHUTDOWN_TIMEOUT_MS = 3000;
@@ -22,6 +24,7 @@ function createServer() {
   }
 
   const app = new Hono();
+  const frontendOrigin = new URL(requireEnv("BASE_FRONTEND_URL")).origin;
 
   app.use("*", async (c, next) => {
     logger.info(`${c.req.method} ${new URL(c.req.url).pathname}`);
@@ -31,7 +34,7 @@ function createServer() {
   app.use(
     "*",
     cors({
-      origin: (origin) => origin || "*",
+      origin: frontendOrigin,
       allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       allowHeaders: ["Content-Type", "Authorization"],
       credentials: true,
@@ -40,6 +43,8 @@ function createServer() {
 
   app.get("/api/auth/github", (c) => loginGithub(c.req.raw));
   app.get("/api/auth/github/callback", (c) => githubResponse(c.req.raw));
+  app.post("/api/auth/refresh", (c) => refreshAccessToken(c.req.raw));
+  app.post("/api/auth/logout", (c) => logout(c.req.raw));
   app.get("/api/user/v1.0/current", (c) => authenticated(getCurrentUser)(c.req.raw));
   app.get("/api/settings/v1.0", (c) => authenticated(pullSettings)(c.req.raw));
   app.put("/api/settings/v1.0", (c) => authenticated(pushSettings)(c.req.raw));
@@ -65,6 +70,7 @@ function createServer() {
   return server;
 }
 
+await ensureRefreshSessionIndexes();
 const server = createServer();
 let shuttingDown = false;
 

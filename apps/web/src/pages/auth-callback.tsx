@@ -5,20 +5,15 @@ import { useRouter } from "@/contexts/router-context";
 
 export function AuthCallbackPage() {
   const { login, isAuthenticated } = useAuth();
-  const { queryParams, navigate, replace } = useRouter();
+  const { navigate, replace } = useRouter();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        const token = queryParams.get("token");
-        if (!token) {
-          setError("Invalid authentication response");
-          return;
-        }
-
-        // Login with the token
-        await login(token);
+        // The backend has placed the refresh credential in an HttpOnly cookie.
+        // Exchange it here so no web token is exposed in the redirect URL.
+        await login();
 
         // Clean up the URL (remove hash)
         replace("/auth/success");
@@ -40,7 +35,7 @@ export function AuthCallbackPage() {
       // Already authenticated, redirect to settings
       navigate("/settings");
     }
-  }, [login, navigate, replace, isAuthenticated, queryParams]);
+  }, [login, navigate, replace, isAuthenticated]);
 
   if (error) {
     return (
