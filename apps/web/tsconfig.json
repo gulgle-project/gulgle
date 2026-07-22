@@ -6,6 +6,9 @@
       "DOM",
       "DOM.Iterable"
     ],
+    "types": [
+      "node"
+    ],
     "useDefineForClassFields": true,
     "isolatedModules": true,
     "noUnusedLocals": true,
