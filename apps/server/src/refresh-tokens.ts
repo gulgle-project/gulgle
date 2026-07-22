@@ -92,6 +92,15 @@ export class RefreshTokenService {
   }
 }
 
+/**
+ * This is the standard split-token (selector + secret) pattern for opaque
+ * tokens, not an invented format. The random UUID selector enables an indexed
+ * database lookup, while the 32 random secret bytes provide the entropy. Only
+ * the SHA-256 hash of the full token is stored, so a database leak exposes no
+ * usable tokens. No signature is needed for tamper protection: the token is an
+ * opaque reference, and any modification changes its hash, so lookup and
+ * rotation fail.
+ */
 function createOpaqueToken(): { selector: string; value: string } {
   const selector = randomUUID();
   return { selector, value: `${selector}.${randomBytes(32).toString("base64url")}` };
