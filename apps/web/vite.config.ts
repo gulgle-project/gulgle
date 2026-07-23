@@ -6,8 +6,13 @@ import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   plugins: [react(), tailwindcss(), VitePWA({
+    // Generate a service worker that activates new versions immediately
+    // (skipWaiting + clientsClaim) and cleans up outdated caches.
     registerType: "autoUpdate",
-    injectRegister: "auto",
+    // Don't inject the plugin's own registration script: the service worker
+    // is registered manually in src/main.ts, where we also reload the page
+    // when a new version takes control (see issue #42).
+    injectRegister: false,
   }),],
   base: "/",
   resolve: {
