@@ -25,6 +25,9 @@ function createServer() {
 
   const app = new Hono();
   const frontendOrigin = new URL(requireEnv("BASE_FRONTEND_URL")).origin;
+  const allowedOrigins = frontendOrigin.includes("://www.")
+    ? [frontendOrigin, frontendOrigin.replace("://www.", "://")]
+    : [frontendOrigin, frontendOrigin.replace("://", "://www.")];
 
   app.use("*", async (c, next) => {
     logger.info(`${c.req.method} ${new URL(c.req.url).pathname}`);
@@ -34,7 +37,7 @@ function createServer() {
   app.use(
     "*",
     cors({
-      origin: frontendOrigin,
+      origin: allowedOrigins,
       allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       allowHeaders: ["Content-Type", "Authorization"],
       credentials: true,
