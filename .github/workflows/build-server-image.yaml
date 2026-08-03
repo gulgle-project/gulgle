@@ -25,11 +25,7 @@ jobs:
         with:
           images: ghcr.io/gulgle-project/gulgle
           tags: |
-            type=schedule
-            type=semver,pattern={{version}}
-            type=ref,event=branch
-            type=ref,event=pr
-            type=sha
+            type=raw,value={{date 'YYYYMMDDHHmmss'}}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
