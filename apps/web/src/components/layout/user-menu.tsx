@@ -1,12 +1,12 @@
 import { LogIn, LogOut, User as UserIcon } from "lucide-react";
+import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/contexts/auth-context";
-import { useRouter } from "@/contexts/router-context";
 
 export function UserMenu() {
   const { user, isAuthenticated, logout } = useAuth();
-  const { navigate } = useRouter();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();

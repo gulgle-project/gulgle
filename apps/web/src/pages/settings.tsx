@@ -1,9 +1,8 @@
+import { useSearchParams } from "react-router";
 import { AccountSettings } from "@/components/settings/account/account-settings";
 import { Customization } from "@/components/settings/customization/customization";
 import { DataSettings } from "@/components/settings/data/data-settings";
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useRouter } from "@/contexts/router-context";
 
 type Tab = {
   value: string;
@@ -38,16 +37,16 @@ function isSettingsTab(value: string | null): value is SettingsTabValue {
 }
 
 export function SettingsPage() {
-  const { queryParams, updateQueryParams } = useRouter();
-  const tabParam = queryParams.get("tab");
-  const selectedTab: SettingsTabValue = isSettingsTab(tabParam) ? tabParam : "account";
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab = searchParams.get("tab");
+  const selectedTab: SettingsTabValue = isSettingsTab(tab) ? tab : "account";
 
   function onTabChange(value: string) {
     if (!isSettingsTab(value)) {
       return;
     }
 
-    updateQueryParams({ tab: value });
+    setSearchParams({ tab: value }, { replace: true });
   }
 
   return (

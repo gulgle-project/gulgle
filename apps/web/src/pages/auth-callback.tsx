@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { Page } from "@/components/layout/page";
 import { useAuth } from "@/contexts/auth-context";
-import { useRouter } from "@/contexts/router-context";
 
 export function AuthCallbackPage() {
   const { login, isAuthenticated } = useAuth();
-  const { navigate, replace } = useRouter();
+  const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -16,7 +16,7 @@ export function AuthCallbackPage() {
         await login();
 
         // Clean up the URL (remove hash)
-        replace("/auth/success");
+        navigate("/auth/success", { replace: true });
 
         // Redirect to settings page after successful login
         setTimeout(() => {
@@ -35,7 +35,7 @@ export function AuthCallbackPage() {
       // Already authenticated, redirect to settings
       navigate("/settings");
     }
-  }, [login, navigate, replace, isAuthenticated]);
+  }, [login, navigate, isAuthenticated]);
 
   if (error) {
     return (
