@@ -1,4 +1,5 @@
 import { AlertCircle, CheckCircle, Cloud, CloudDownload, CloudOff, CloudUpload, RefreshCw } from "lucide-react";
+import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -10,13 +11,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/contexts/auth-context";
-import { useRouter } from "@/contexts/router-context";
 import { useSettingsSync } from "@/hooks/use-settings-sync.hook";
 import { bangManager } from "@/state/bang-manager";
 
 export function CloudSync() {
   const { isAuthenticated } = useAuth();
-  const { navigate } = useRouter();
+  const navigate = useNavigate();
   const {
     status,
     error,

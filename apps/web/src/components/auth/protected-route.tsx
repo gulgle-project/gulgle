@@ -1,6 +1,6 @@
 import { type ReactNode, useEffect } from "react";
+import { useNavigate } from "react-router";
 import { useAuth } from "@/contexts/auth-context";
-import { useRouter } from "@/contexts/router-context";
 
 type ProtectedRouteProps = {
   children: ReactNode;
@@ -14,7 +14,7 @@ type ProtectedRouteProps = {
  */
 export function ProtectedRoute({ children, redirectTo = "/login" }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading } = useAuth();
-  const { navigate } = useRouter();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {

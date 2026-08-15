@@ -1,7 +1,7 @@
 import { Settings } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { GitHubIcon } from "@/assets/github-icon";
-import { useRouter } from "@/contexts/router-context";
 import { useMount } from "@/hooks/use-mount.hook";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
@@ -9,7 +9,7 @@ import { ThemeToggle } from "./theme-toggle";
 import { UserMenu } from "./user-menu";
 
 export function Header() {
-  const { navigate } = useRouter();
+  const navigate = useNavigate();
   const [starCount, setStarCount] = useState<string | null>(null);
 
   useMount(() => {

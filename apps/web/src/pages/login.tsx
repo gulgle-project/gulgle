@@ -1,15 +1,15 @@
 import { useEffect } from "react";
+import { useNavigate } from "react-router";
 import { GitHubIcon } from "@/assets/github-icon";
 import { Page } from "@/components/layout/page";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/auth-context";
-import { useRouter } from "@/contexts/router-context";
 import { apiClient } from "@/lib/api-client";
 
 export function LoginPage() {
   const { isAuthenticated, isLoading } = useAuth();
-  const { navigate } = useRouter();
+  const navigate = useNavigate();
 
   // Redirect if already authenticated
   useEffect(() => {
