@@ -271,6 +271,7 @@ class BangManagerState {
     this._allBangs = null;
     this.storage.removeItem(STORAGE_KEY);
     this.storage.removeItem(DEFAULT_BANG_KEY);
+    this.storage.removeItem(LAST_SYNC_KEY);
     this.emit({ payload: [], type: "CUSTOM_BANGS_CHANGED" });
     this.emit({ payload: undefined, type: "DEFAULT_BANG_CHANGED" });
   }

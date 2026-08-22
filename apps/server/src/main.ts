@@ -5,7 +5,7 @@ import { cors } from "hono/cors";
 import { logout, refreshAccessToken } from "./auth";
 import { githubResponse, loginGithub } from "./handlers/github-auth";
 import { pullSettings, pushSettings } from "./handlers/settings";
-import { getCurrentUser } from "./handlers/user";
+import { deleteCurrentUser, getCurrentUser } from "./handlers/user";
 import { logger } from "./logger";
 import { authenticated } from "./middleware/authenticated";
 import { ensureRefreshSessionIndexes } from "./repositories/refresh-session";
@@ -46,6 +46,7 @@ function createServer() {
   app.post("/api/auth/refresh", (c) => refreshAccessToken(c.req.raw));
   app.post("/api/auth/logout", (c) => logout(c.req.raw));
   app.get("/api/user/v1.0/current", (c) => authenticated(getCurrentUser)(c.req.raw));
+  app.delete("/api/user/v1.0/current", (c) => authenticated(deleteCurrentUser)(c.req.raw));
   app.get("/api/settings/v1.0", (c) => authenticated(pullSettings)(c.req.raw));
   app.put("/api/settings/v1.0", (c) => authenticated(pushSettings)(c.req.raw));
 
