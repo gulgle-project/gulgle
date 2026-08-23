@@ -52,5 +52,11 @@ jobs:
       - name: Build server
         run: pnpm --filter gulgle-server build
 
-      - name: Run server tests
-        run: pnpm --filter gulgle-server test
+      - name: Build web app
+        run: pnpm --filter gulgle-web build
+
+      - name: Build extension
+        run: pnpm build:extension
+
+      - name: Run tests
+        run: pnpm -r test
