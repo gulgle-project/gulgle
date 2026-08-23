@@ -22,6 +22,17 @@ We solved this by doing all of the work client side. After you've went to https:
 - Settings import & export: Users can backup their data (custom bangs, default bang) in JSON format.
 - Automated Bang List Updates: A GitHub Actions workflow is set up to automatically fetch and update the list of default bangs from ~~DuckDuckGo~~ Kagi on a monthly basis.
 
+## Chrome extension
+
+Build the unpacked Manifest V3 extension with:
+
+```sh
+pnpm build:extension
+```
+
+See [`apps/extension/README.md`](apps/extension/README.md) for instructions on
+loading it in Chrome's Developer mode.
+
 ## Acknowledgments
 
 This project is built upon and was initially forked from [unduck](https://github.com/T3-Content/unduck).

@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --mode dev --open",
     "build": "tsc && vite build",
+    "build:extension": "tsc && vite build --mode extension",
     "preview": "vite preview",
     "test": "node --import tsx --test src/lib/api-client.test.ts",
     "typecheck": "tsc --noEmit"

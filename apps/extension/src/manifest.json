@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Gulgle",
+  "description": "Use Gulgle for new tabs, your homepage, and your default search engine.",
+  "version": "1.0.0",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "chrome_settings_overrides": {
+    "homepage": "https://www.gulgle.link/",
+    "startup_pages": ["https://www.gulgle.link/"],
+    "search_provider": {
+      "name": "Gulgle",
+      "keyword": "gulgle.link",
+      "search_url": "https://www.gulgle.link?q={searchTerms}",
+      "favicon_url": "https://www.gulgle.link/favicon.ico",
+      "encoding": "UTF-8",
+      "is_default": true
+    }
+  }
+}
