@@ -31,7 +31,7 @@ export function App() {
 function AppContent() {
   return (
     <ThemeProvider>
-      <div className="h-dvh flex flex-col items-center bg-white-100 dark:bg-neutral-900 custom-scrollbar overflow-x-hidden overflow-y-auto">
+      <div className="custom-scrollbar flex h-dvh flex-col items-center overflow-x-hidden overflow-y-auto bg-background">
         <Header />
         <Outlet />
         <Toaster />

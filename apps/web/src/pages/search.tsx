@@ -1,3 +1,4 @@
+import { ExternalLink } from "lucide-react";
 import { Page } from "@/components/layout/page";
 import { CopySearchEngine } from "@/components/search/copy-search-engine";
 import { SearchBar } from "@/components/search/search-bar";
@@ -5,25 +6,32 @@ import { SearchBar } from "@/components/search/search-bar";
 export function SearchPage() {
   return (
     <Page centered>
-      <h1 className="mb-16 select-none text-8xl">Gulgle</h1>
+      <main className="relative flex w-full flex-col items-center py-12 [@media(max-height:760px)]:py-10">
+        <div className="mb-9 text-center">
+          <p className="mb-3 text-xs font-semibold tracking-[0.14em] text-violet-600 uppercase dark:text-violet-400">
+            One search, thousands of shortcuts
+          </p>
+          <h1 className="select-none text-6xl font-semibold tracking-[-0.065em] sm:text-7xl">Gulgle</h1>
+          <p className="mt-3 text-base text-muted-foreground sm:text-lg">Search the web faster with bangs built in.</p>
+        </div>
 
-      <SearchBar />
+        <SearchBar />
 
-      <div className="w-full max-w-xl mb-8 text-center">
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-          Gulgle includes all of&nbsp;
+        <p className="mt-4 text-sm text-muted-foreground">
+          Includes all of&nbsp;
           <a
-            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline text-sm transition-colors"
+            className="inline-flex items-center gap-1 font-medium text-violet-600 underline decoration-current/35 underline-offset-4 transition-colors hover:decoration-current dark:text-violet-400"
             href="https://kbe.smaertness.net/"
             rel="noopener noreferrer"
             target="_blank"
           >
             Kagi's bangs
+            <ExternalLink aria-hidden="true" className="size-3.5" />
           </a>
         </p>
-      </div>
 
-      <CopySearchEngine />
+        <CopySearchEngine />
+      </main>
     </Page>
   );
 }

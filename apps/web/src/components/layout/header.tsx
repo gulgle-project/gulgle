@@ -57,7 +57,7 @@ export function Header() {
           <GitHubIcon />
           <span className="hidden sm:inline">Star</span>
           <Separator className="mx-1" orientation="vertical" />
-          {starCount ? <span className="hidden md:inline text-muted-foreground">{starCount}</span> : null}
+          {starCount ? <span className="text-muted-foreground tabular-nums">{starCount}</span> : null}
         </Button>
 
         <Separator orientation="vertical" />
