@@ -1,5 +1,3 @@
-import assert from "node:assert/strict";
-import test from "node:test";
 import jwt from "jsonwebtoken";
 
 process.env.GITHUB_CLIENT_ID = "test-client";

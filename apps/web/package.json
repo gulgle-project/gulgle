@@ -1,19 +1,15 @@
 {
   "name": "gulgle-web",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --mode dev --open",
-    "build": "tsc && vite build",
-    "build:extension": "tsc && vite build --mode extension",
-    "preview": "vite preview",
-    "test": "node --import tsx --test src/lib/api-client.test.ts",
+    "dev": "vp dev --mode dev --open",
+    "build": "tsc && vp build",
+    "build:extension": "tsc && vp build --mode extension",
+    "preview": "vp preview",
+    "test": "vp test",
     "typecheck": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "tw-animate-css": "^1.4.0",
-    "vite": "^8.0.13"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
@@ -28,8 +24,8 @@
     "gulgle-shared": "workspace:^",
     "lucide-react": "^1.16.0",
     "next-themes": "^0.4.6",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "react-router": "^8.3.0",
     "shadcn": "^4.7.0",
     "sonner": "^2.0.7",
@@ -37,5 +33,12 @@
     "tailwindcss": "^4.3.0",
     "vite-plugin-pwa": "^1.3.0",
     "workbox-window": "^7.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "tw-animate-css": "^1.4.0",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   }
 }

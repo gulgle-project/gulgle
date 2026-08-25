@@ -1,25 +1,14 @@
 {
   "name": "gulgle-server",
-  "main": "dist/main.mjs",
-  "type": "module",
   "private": true,
+  "type": "module",
+  "main": "dist/main.mjs",
   "scripts": {
-    "build": "tsdown",
+    "build": "vp pack",
     "dev": "tsx watch src/main.ts",
     "start": "node dist/main.mjs",
-    "test": "node --import tsx --test src/*.test.ts src/handlers/*.test.ts src/middleware/*.test.ts",
-    "biome:check": "biome check .",
-    "biome:write": "biome check . --write",
-    "biome:ci": "biome ci .",
+    "test": "vp test",
     "typecheck": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.10",
-    "tsdown": "^0.22.0",
-    "tsx": "^4.22.0"
-  },
-  "peerDependencies": {
-    "typescript": "^6"
   },
   "dependencies": {
     "@hono/node-server": "^2.0.2",
@@ -31,5 +20,16 @@
     "openid-client": "^6.8.4",
     "winston": "^3.19.0",
     "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "catalog:",
+    "tsx": "^4.22.0",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "typescript": "^6"
   }
 }

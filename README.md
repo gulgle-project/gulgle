@@ -1,7 +1,6 @@
 # Gulgle - Custom bangs and more
 
-
-DuckDuckGo's bang redirects are too slow. Add the following URL as a custom search engine to your browser. Enables all of  ~~DuckDuckGo's~~ Kagi's bangs to work, but much faster.
+DuckDuckGo's bang redirects are too slow. Add the following URL as a custom search engine to your browser. Enables all of ~~DuckDuckGo's~~ Kagi's bangs to work, but much faster.
 
 ```
 https://gulgle.link?q=%s
@@ -32,6 +31,23 @@ pnpm build:extension
 
 See [`apps/extension/README.md`](apps/extension/README.md) for instructions on
 loading it in Chrome's Developer mode.
+
+## Development
+
+This monorepo uses [VitePlus](https://viteplus.dev/) with pnpm as its package manager. After installing dependencies with `pnpm install`, the primary commands are:
+
+```sh
+pnpm check
+pnpm test
+pnpm dev
+pnpm build
+```
+
+`pnpm dev` and `pnpm build` open an interactive selector for the web app, the
+server, or both. For a non-interactive, targeted command, use `pnpm dev:web`,
+`pnpm dev:server`, `pnpm build:web`, or `pnpm build:server`.
+
+`pnpm check` runs Oxfmt, Oxlint, and type-aware checks through VitePlus. Tests run with VitePlus's bundled Vitest, web builds use Vite, and server builds use the bundled tsdown packer.
 
 ## Acknowledgments
 
