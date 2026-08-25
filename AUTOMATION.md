@@ -5,12 +5,14 @@ This project includes automated updates for the bang list from Kagi.
 ## How it works
 
 ### 1. GitHub Actions Workflow
+
 - **File**: `.github/workflows/update-bangs.yml`
 - **Schedule**: Runs automatically on the 1st of every month at 2 AM UTC
 - **Manual trigger**: Can be triggered manually via GitHub Actions UI
 - **Auto-trigger**: Runs when the workflow file itself is updated
 
 ### 2. Update Script
+
 - **File**: `scripts/update-bangs.js`
 - **Function**: Fetches bang data from `"https://raw.githubusercontent.com/kagisearch/bangs/refs/heads/main/data/bangs.json"` and converts it to our format
 - **Output**: Updates `src/bang.ts` with the latest bang definitions
@@ -18,10 +20,11 @@ This project includes automated updates for the bang list from Kagi.
 ### 3. Data Format Conversion
 
 **Kagi bang format:**
+
 ```json
 {
   "c": "Tech",
-  "d": "www.01net.com", 
+  "d": "www.01net.com",
   "r": 0,
   "s": "01net",
   "sc": "Downloads (apps)",
@@ -31,10 +34,11 @@ This project includes automated updates for the bang list from Kagi.
 ```
 
 **Our format:**
+
 ```typescript
 {
   t: "01net",                    // trigger
-  s: "01net",                    // name/description  
+  s: "01net",                    // name/description
   u: "http://www.01net.com/...", // url template
   d: "www.01net.com"             // domain
 }
@@ -60,6 +64,7 @@ npm run update-bangs
 ## First Run
 
 The workflow is configured to run immediately when:
+
 1. The workflow file is first added/updated
 2. Pushed to the main/master branch
 
@@ -68,6 +73,7 @@ After that, it will run monthly on the 1st of each month.
 ## Monitoring
 
 Check the GitHub Actions tab in your repository to monitor:
+
 - Workflow execution status
 - Update logs
 - Any errors or failures
@@ -90,4 +96,4 @@ src/
 - **DO NOT** manually edit `src/bang.ts` - it will be overwritten
 - The script handles special characters and escaping automatically
 - Updates are atomic - either all bangs update or none do
-- The workflow uses Node.js 18 for compatibility 
+- The workflow uses Node.js 18 for compatibility

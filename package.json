@@ -6,19 +6,31 @@
     "packages/*",
     "scripts"
   ],
+  "type": "module",
   "scripts": {
-    "biome:check": "biome check .",
-    "biome:write": "biome check . --write",
-    "biome:ci": "biome ci .",
+    "build": "node ./scripts/run-apps.mjs build",
+    "check": "vp check",
+    "dev": "node ./scripts/run-apps.mjs dev",
+    "fmt": "vp fmt",
+    "fmt:check": "vp fmt --check",
+    "lint": "vp lint",
+    "lint:fix": "vp lint --fix",
+    "test": "vp test",
     "build:extension": "pnpm --filter gulgle-extension build",
+    "build:server": "pnpm --filter gulgle-server build",
+    "build:web": "pnpm --filter gulgle-web build",
+    "dev:server": "pnpm --filter gulgle-server dev",
+    "dev:web": "pnpm --filter gulgle-web dev",
     "typecheck": "pnpm -r typecheck",
     "update-bangs": "tsx ./scripts/update-bangs.ts"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.15",
-    "@types/node": "^24.12.4",
+    "@types/node": "catalog:",
     "tsx": "^4.22.0",
-    "typescript": "~6.0.3"
+    "typescript": "~6.0.3",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   },
   "packageManager": "pnpm@11.1.2"
 }

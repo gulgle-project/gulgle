@@ -1,7 +1,7 @@
 {
   "name": "gulgle-extension",
-  "private": true,
   "version": "1.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
     "build": "pnpm --filter gulgle-web build:extension && node ./scripts/build.mjs",

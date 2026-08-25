@@ -1,14 +1,14 @@
 import path from "path";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig, lazyPlugins } from "vite-plus";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig(({ mode }) => {
   const isExtensionBuild = mode === "extension";
 
   return {
-    plugins: [
+    plugins: lazyPlugins(() => [
       react(),
       tailwindcss(),
       ...(!isExtensionBuild
@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => {
             }),
           ]
         : []),
-    ],
+    ]),
     base: isExtensionBuild ? "./" : "/",
     build: isExtensionBuild
       ? {
@@ -42,6 +42,10 @@ export default defineConfig(({ mode }) => {
           },
         },
     publicDir: isExtensionBuild ? false : "public",
+    test: {
+      globals: true,
+      include: ["src/**/*.test.ts"],
+    },
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),

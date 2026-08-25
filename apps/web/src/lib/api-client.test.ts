@@ -1,6 +1,3 @@
-import assert from "node:assert/strict";
-import test from "node:test";
-
 const storage = new Map<string, string>();
 Object.assign(globalThis, {
   localStorage: {
@@ -57,7 +54,7 @@ test("does not retry indefinitely and reports terminal refresh failure", async (
   };
 
   try {
-    await assert.rejects(() => authenticatedFetch("/api/settings/v1.0"), { name: "UnauthorizedError" });
+    await expect(authenticatedFetch("/api/settings/v1.0")).rejects.toMatchObject({ name: "UnauthorizedError" });
     assert.equal(calls, 2);
   } finally {
     globalThis.fetch = originalFetch;

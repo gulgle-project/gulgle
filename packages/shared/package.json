@@ -1,15 +1,15 @@
 {
   "name": "gulgle-shared",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
   "type": "module",
+  "types": "src/index.ts",
   "exports": {
     ".": {
       "types": "./src/index.ts",
       "default": "./src/index.ts"
     }
   },
-  "types": "src/index.ts",
   "scripts": {
     "build": "tsc --outDir dist",
     "typegen": "tsc --emitDeclarationOnly",

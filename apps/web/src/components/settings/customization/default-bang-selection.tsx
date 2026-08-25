@@ -21,16 +21,17 @@ export function DefaultBangSelection() {
   const [searchValue, setSearchValue] = useState("");
   const [visibleCount, setVisibleCount] = useState(WINDOW_SIZE);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: workaround because of non-react state
+  // oxlint-disable react-hooks/exhaustive-deps -- Workaround for non-React state.
   useEffect(() => {
     async function fetchBangs() {
       try {
         const allBangs = await getAllBangs();
         setBangs(allBangs);
-      } catch (_error) {}
+      } catch {}
     }
     fetchBangs();
   }, [customBangs]);
+  // oxlint-enable react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!open) {
