@@ -1,6 +1,6 @@
-import path from "path"
-import tailwindcss from "@tailwindcss/vite"
-import react from "@vitejs/plugin-react"
+import path from "path";
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
@@ -31,7 +31,16 @@ export default defineConfig(({ mode }) => {
             input: path.resolve(__dirname, "./newtab.html"),
           },
         }
-      : undefined,
+      : {
+          rollupOptions: {
+            // Emit a real /privacy/ entry so the policy is directly reachable on
+            // GitHub Pages, which does not provide SPA route fallbacks.
+            input: {
+              main: path.resolve(__dirname, "index.html"),
+              privacy: path.resolve(__dirname, "privacy/index.html"),
+            },
+          },
+        },
     publicDir: isExtensionBuild ? false : "public",
     resolve: {
       alias: {
