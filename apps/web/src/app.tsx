@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router";
+import { Footer } from "./components/layout/footer";
 import { Header } from "./components/layout/header";
 import { ThemeProvider } from "./components/layout/theme-provider";
 import { Toaster } from "./components/ui/sonner";
@@ -6,6 +7,7 @@ import { AuthProvider } from "./contexts/auth-context";
 import { AuthCallbackPage } from "./pages/auth-callback";
 import { ImprintPage } from "./pages/imprint";
 import { LoginPage } from "./pages/login";
+import { PrivacyPage } from "./pages/privacy";
 import { SearchPage } from "./pages/search";
 import { SettingsPage } from "./pages/settings";
 
@@ -19,6 +21,7 @@ export function App() {
             <Route element={<Navigate replace to="/" />} path="/search" />
             <Route element={<SettingsPage />} path="/settings" />
             <Route element={<ImprintPage />} path="/imprint" />
+            <Route element={<PrivacyPage />} path="/privacy" />
             <Route element={<LoginPage />} path="/login" />
             <Route element={<AuthCallbackPage />} path="/auth/success" />
           </Route>
@@ -34,6 +37,7 @@ function AppContent() {
       <div className="custom-scrollbar flex h-dvh flex-col items-center overflow-x-hidden overflow-y-auto bg-background">
         <Header />
         <Outlet />
+        <Footer />
         <Toaster />
       </div>
     </ThemeProvider>

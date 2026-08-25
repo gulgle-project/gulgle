@@ -50,7 +50,14 @@ export function LoginPage() {
             </div>
 
             <div className="text-sm text-gray-500 dark:text-gray-400">
-              <p>By signing in, you agree to sync your custom bangs and default search engine settings.</p>
+              <p>
+                Signing in shares your GitHub account ID, name, and available profile email with Gulgle and syncs your
+                custom bangs and default search engine. See our{" "}
+                <a className="font-medium text-foreground underline underline-offset-4" href="/privacy/">
+                  Privacy Policy
+                </a>
+                .
+              </p>
             </div>
           </div>
         </Card>
