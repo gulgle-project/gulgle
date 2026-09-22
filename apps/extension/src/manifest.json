@@ -14,7 +14,6 @@
   },
   "chrome_settings_overrides": {
     "homepage": "https://www.gulgle.link/",
-    "startup_pages": ["https://www.gulgle.link/"],
     "search_provider": {
       "name": "Gulgle",
       "keyword": "gulgle.link",
