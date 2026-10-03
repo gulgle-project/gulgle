@@ -1,4 +1,4 @@
-import { ExternalLink } from "lucide-react";
+import { IconExternalLink } from "@tabler/icons-react";
 import { Page } from "@/components/layout/page";
 
 type SearchStartPageProps = {
@@ -30,7 +30,7 @@ export function SearchStartPage({ centerOnShortViewports = false, defaultSetup, 
             target="_blank"
           >
             Kagi's bangs
-            <ExternalLink aria-hidden="true" className="size-3.5" />
+            <IconExternalLink aria-hidden="true" className="size-3.5" />
           </a>
         </p>
 

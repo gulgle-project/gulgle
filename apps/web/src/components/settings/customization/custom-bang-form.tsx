@@ -1,5 +1,5 @@
 import type { CustomBang } from "gulgle-shared";
-import { Plus, Save } from "lucide-react";
+import { IconDeviceFloppy, IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -119,12 +119,12 @@ function CustomBangForm({
               <Button type="submit">
                 {bang ? (
                   <>
-                    <Save />
+                    <IconDeviceFloppy />
                     Save Changes
                   </>
                 ) : (
                   <>
-                    <Plus />
+                    <IconPlus />
                     Add Bang
                   </>
                 )}

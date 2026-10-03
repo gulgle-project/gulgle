@@ -1,4 +1,4 @@
-import { Search, X } from "lucide-react";
+import { IconSearch, IconX } from "@tabler/icons-react";
 import { useState } from "react";
 
 type SearchFormProps = {
@@ -18,7 +18,7 @@ export function SearchForm({ onSearch }: SearchFormProps) {
       className="flex w-full items-center gap-2 rounded-2xl border border-input bg-card p-2 shadow-[0_16px_50px_-24px_oklch(0.25_0.08_285/0.35)] transition-[border-color,box-shadow] duration-200 focus-within:border-violet-500/65 focus-within:ring-3 focus-within:ring-violet-500/10 focus-within:shadow-[0_20px_60px_-24px_oklch(0.57_0.22_285/0.32)]"
       onSubmit={submit}
     >
-      <Search aria-hidden="true" className="ml-3 size-5 shrink-0 text-muted-foreground" />
+      <IconSearch aria-hidden="true" className="ml-3 size-5 shrink-0 text-muted-foreground" />
       <div className="flex min-w-0 flex-1 items-center">
         <input
           aria-label="Search query"
@@ -37,7 +37,7 @@ export function SearchForm({ onSearch }: SearchFormProps) {
             onClick={() => setQuery("")}
             type="button"
           >
-            <X className="size-4" />
+            <IconX className="size-4" />
           </button>
         )}
       </div>

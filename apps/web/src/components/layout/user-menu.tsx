@@ -1,4 +1,4 @@
-import { LogIn, LogOut, User as UserIcon } from "lucide-react";
+import { IconLogin, IconLogout, IconUser } from "@tabler/icons-react";
 import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -20,7 +20,7 @@ export function UserMenu() {
   if (!isAuthenticated || !user) {
     return (
       <Button onClick={handleLogin} variant="ghost">
-        <LogIn />
+        <IconLogin />
         <span className="sr-only">Sign In</span>
       </Button>
     );
@@ -30,7 +30,7 @@ export function UserMenu() {
     <Popover>
       <PopoverTrigger>
         <Button className="gap-2" variant="ghost">
-          <UserIcon className="h-4 w-4" />
+          <IconUser className="h-4 w-4" />
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-64">
@@ -44,7 +44,7 @@ export function UserMenu() {
           </div>
           <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
             <Button className="w-full gap-2" onClick={handleLogout} size="sm" variant="outline">
-              <LogOut className="h-4 w-4" />
+              <IconLogout className="h-4 w-4" />
               Sign Out
             </Button>
           </div>

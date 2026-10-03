@@ -1,5 +1,5 @@
 import type { Bang } from "gulgle-shared";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { IconCheck, IconSelector } from "@tabler/icons-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
@@ -136,7 +136,7 @@ export function DefaultBangSelection() {
             variant="outline"
           >
             {defaultBang ? `!${defaultBang.t} - ${defaultBang.s}` : "Select default search engine"}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <IconSelector className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
 
           {open && (
@@ -164,7 +164,7 @@ export function DefaultBangSelection() {
                           }}
                           value={`!${bang.t} ${bang.s} ${bang.ts?.join(" ") || ""}`}
                         >
-                          <Check
+                          <IconCheck
                             className={cn("mr-2 h-4 w-4", defaultBang?.t === bang.t ? "opacity-100" : "opacity-0")}
                           />
                           !{bang.t} - {bang.s} {bang.ts?.length && `[${bang.ts?.join(", ")}]`}

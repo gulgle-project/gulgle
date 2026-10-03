@@ -1,4 +1,4 @@
-import { AlertCircle, Trash2 } from "lucide-react";
+import { IconAlertCircle, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
@@ -47,7 +47,7 @@ export function DeleteAccount() {
       <Card className="border-destructive/50 p-6">
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <Trash2 className="h-5 w-5 text-destructive" />
+            <IconTrash className="h-5 w-5 text-destructive" />
             <h3 className="text-lg font-semibold">Danger zone</h3>
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -72,7 +72,7 @@ export function DeleteAccount() {
           {error && (
             <div className="rounded-md bg-red-50 p-3 dark:bg-red-900/20">
               <div className="flex items-start gap-2">
-                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
+                <IconAlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
                 <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
               </div>
             </div>

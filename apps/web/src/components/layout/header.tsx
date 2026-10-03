@@ -1,4 +1,4 @@
-import { Settings } from "lucide-react";
+import { IconSettings } from "@tabler/icons-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { GitHubIcon } from "@/assets/github-icon";
@@ -68,7 +68,7 @@ export function Header() {
 
         <UserMenu />
         <Button onClick={() => navigate("/settings")} size="icon" title="Settings" variant="ghost">
-          <Settings />
+          <IconSettings />
         </Button>
       </div>
     </div>

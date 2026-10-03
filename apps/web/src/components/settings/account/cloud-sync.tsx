@@ -1,4 +1,12 @@
-import { AlertCircle, CheckCircle, Cloud, CloudDownload, CloudOff, CloudUpload, RefreshCw } from "lucide-react";
+import {
+  IconAlertCircle,
+  IconCircleCheck,
+  IconCloud,
+  IconCloudDownload,
+  IconCloudOff,
+  IconCloudUpload,
+  IconRefresh,
+} from "@tabler/icons-react";
 import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -66,7 +74,7 @@ export function CloudSync() {
       <Card className="p-6">
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <CloudOff className="h-5 w-5 text-gray-400" />
+            <IconCloudOff className="h-5 w-5 text-gray-400" />
             <h3 className="text-lg font-semibold">Cloud Sync</h3>
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400">Sign in to sync your settings across devices</p>
@@ -84,12 +92,12 @@ export function CloudSync() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Cloud className="h-5 w-5 text-blue-500" />
+              <IconCloud className="h-5 w-5 text-blue-500" />
               <h3 className="text-lg font-semibold">Cloud Sync</h3>
             </div>
-            {status === "success" && <CheckCircle className="h-5 w-5 text-green-500" />}
-            {status === "error" && <AlertCircle className="h-5 w-5 text-red-500" />}
-            {status === "syncing" && <RefreshCw className="h-5 w-5 text-blue-500 animate-spin" />}
+            {status === "success" && <IconCircleCheck className="h-5 w-5 text-green-500" />}
+            {status === "error" && <IconAlertCircle className="h-5 w-5 text-red-500" />}
+            {status === "syncing" && <IconRefresh className="h-5 w-5 text-blue-500 animate-spin" />}
           </div>
 
           {lastSyncTime && (
@@ -99,7 +107,7 @@ export function CloudSync() {
           {error && (
             <div className="rounded-md bg-red-50 dark:bg-red-900/20 p-3">
               <div className="flex items-start gap-2">
-                <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+                <IconAlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
                   <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
                   <Button
@@ -117,15 +125,15 @@ export function CloudSync() {
 
           <div className="flex flex-wrap gap-2">
             <Button className="gap-2" disabled={status === "syncing"} onClick={handleSync}>
-              <RefreshCw className={`h-4 w-4 ${status === "syncing" ? "animate-spin" : ""}`} />
+              <IconRefresh className={`h-4 w-4 ${status === "syncing" ? "animate-spin" : ""}`} />
               Sync Now
             </Button>
             <Button className="gap-2" disabled={status === "syncing"} onClick={handlePush} variant="outline">
-              <CloudUpload className="h-4 w-4" />
+              <IconCloudUpload className="h-4 w-4" />
               Push to Cloud
             </Button>
             <Button className="gap-2" disabled={status === "syncing"} onClick={handlePull} variant="outline">
-              <CloudDownload className="h-4 w-4" />
+              <IconCloudDownload className="h-4 w-4" />
               Pull from Cloud
             </Button>
           </div>

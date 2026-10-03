@@ -1,5 +1,5 @@
 import type { CustomBang } from "gulgle-shared";
-import { SquarePen, Trash } from "lucide-react";
+import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -125,10 +125,10 @@ function CustomBangListItem({ bang, onEdit, onDelete }: CustomBangListItemProps)
 
       <div className="flex w-full gap-2">
         <Button className="flex-1" onClick={() => onEdit(bang)} variant="default">
-          <SquarePen /> Edit
+          <IconEdit /> Edit
         </Button>
         <Button className="flex-1" onClick={() => onDelete(bang)} variant="destructive">
-          <Trash /> Delete
+          <IconTrash /> Delete
         </Button>
       </div>
     </div>

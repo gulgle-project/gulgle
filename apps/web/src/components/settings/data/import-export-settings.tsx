@@ -1,4 +1,4 @@
-import { ArrowDownToLine, ArrowUpToLine } from "lucide-react";
+import { IconDownload, IconUpload } from "@tabler/icons-react";
 import { useRef } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -77,11 +77,11 @@ export function ImportExportSettings() {
 
         <div className="grid grid-cols-2 gap-4">
           <Button onClick={handleImport} variant="secondary">
-            <ArrowUpToLine />
+            <IconUpload />
             Import Settings
           </Button>
           <Button onClick={handleExport} variant="secondary">
-            <ArrowDownToLine />
+            <IconDownload />
             Export Settings
           </Button>
         </div>

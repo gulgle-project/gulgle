@@ -1,4 +1,4 @@
-import { Clipboard, ClipboardCheck } from "lucide-react";
+import { IconClipboard, IconClipboardCheck } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -41,7 +41,7 @@ export function CopySearchEngine() {
           onClick={copy}
           type="button"
         >
-          {copied ? <ClipboardCheck className="size-4" /> : <Clipboard className="size-4" />}
+          {copied ? <IconClipboardCheck className="size-4" /> : <IconClipboard className="size-4" />}
         </button>
       </div>
     </section>
